@@ -1,7 +1,7 @@
 # Complete project details at https://RandomNerdTutorials.com/raspberry-pi-pico-analog-inputs-micropython/
 from machine import Pin, PWM
 from picozero import Speaker
-from time import sleep
+from utime import sleep, ticks_us
 
 # gpio pin numbers
 ingpio = (2, 3, 4, 5)
@@ -11,6 +11,7 @@ buzzgpio = (18, 19, 20, 21, 22)
 # keyboard matrix pins
 outputs = [Pin(n, Pin.OUT) for n in outgpio]
 inputs = [Pin(n, Pin.IN, Pin.PULL_DOWN) for n in ingpio]
+nkeys = len(outputs) * len(inputs)
 
 # buzzers
 buzzers = [Speaker(n) for n in buzzgpio]
@@ -64,5 +65,47 @@ def stopall():
     for b in buzzers:
         b.off()
 
-# poll every key and return a 2d array of booleans
-#def poll():
+# poll every key and return an array of booleans
+def poll():
+    A = [None for i in range(nkeys)]
+    
+    # clear every output pin to be safe
+    for i in range(len(outputs)):
+        outputs[i].off()
+    
+    for i in range(len(outputs)):
+        outputs[i].on()
+        
+        for j in range(len(inputs)):
+            val = inputs[j].value()
+            A[j*len(outputs) + i] = val
+        
+        outputs[i].off()
+    
+    return A
+
+# time a function (returns microseconds)
+def timeit(f, n=500):
+    a = ticks_us()
+    for i in range(n):
+        f()
+    b = ticks_us()
+    return (b-a)/n
+
+def sing():
+    A = [0 for i in range(nkeys)]
+    while True:
+        newA = poll()
+        for i in range(nkeys):
+            if A[i] != newA[i]:
+                if newA[i] == 0:
+                    stop(freqs[i])
+                    print(buffer)
+                else:
+                    play(freqs[i])
+                    print(buffer)
+        A = newA
+
+#while True:
+#    print(poll())
+#    sleep(0.1)
