@@ -1,12 +1,11 @@
 # Complete project details at https://RandomNerdTutorials.com/raspberry-pi-pico-analog-inputs-micropython/
 from machine import Pin, PWM
-from picozero import Speaker
 from utime import sleep, ticks_us
 
 # gpio pin numbers
 ingpio = (2, 3, 4, 5)
 outgpio = (6, 7, 8, 9)
-buzzgpio = (18, 19, 20, 21, 22)
+buzzgpio = (17, 19, 21, 26)
 
 # keyboard matrix pins
 outputs = [Pin(n, Pin.OUT) for n in outgpio]
@@ -14,7 +13,7 @@ inputs = [Pin(n, Pin.IN, Pin.PULL_DOWN) for n in ingpio]
 nkeys = len(outputs) * len(inputs)
 
 # buzzers
-buzzers = [Speaker(n) for n in buzzgpio]
+buzzers = [PWM(Pin(n)) for n in buzzgpio]
 # keep track of which buzzer is playing what note
 buffer = [None for n in buzzgpio]
 
@@ -26,6 +25,13 @@ verbose = True
 def message(msg):
     if verbose:
         print(msg)
+
+def buzz(pin, freq):
+    pin.freq(freq)
+    pin.duty_u16(30000)
+
+def unbuzz(pin):
+    pin.duty_u16(0)
 
 # play a frequency on an available buzzer
 def play(hz):
@@ -40,10 +46,8 @@ def play(hz):
         return
     
     i = buffer.index(None)
-    try:
-        buzzers[i].play(hz, duration=None)
-    except:
-        pass
+    print(i)
+    buzz(buzzers[i], hz)
     buffer[i] = hz
     message(f"playing {hz} Hz")
 
@@ -56,14 +60,14 @@ def stop(hz):
         return
     
     i = buffer.index(hz)
-    buzzers[i].off()
+    unbuzz(buzzers[i])
     buffer[i] = None
     message(f"stopped playing {hz} Hz")
 
 # stop all buzzers
 def stopall():
     for b in buzzers:
-        b.off()
+        unbuzz(b)
 
 # poll every key and return an array of booleans
 def poll():
