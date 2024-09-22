@@ -10,14 +10,14 @@ LATCH = 8
 pi = pigpio.pi()
 
 # bit bang some data
-# A is a string of 0s and 1s
+# A is a list of 0s and 1s
 def bang(A):
     pi.write(CLOCK, 0)
     pi.write(LATCH, 0)
     
-    for c in reversed(A):
+    for val in A:
         pi.write(CLOCK, 0)
-        pi.write(DATA, int(c))
+        pi.write(DATA, val)
         pi.write(CLOCK, 1)
     
     pi.write(CLOCK, 0)
@@ -37,6 +37,35 @@ def count():
         H = i // 256
         spi([L,H])
         time.sleep(0.01)
+
+n = 2**16
+# compare the performance of bit banging with SPI
+def time_spi(baud):
+    # precompute the data
+    spi_data = [(i%256, i//256) for i in range(n)]
+    
+        
+    print("timing SPI...")
+    h = pi.spi_open(0, baud, 0)
+    a=time.time_ns()
+    for data in spi_data:
+        pi.spi_write(h, data)
+    b = time.time_ns()
+    pi.spi_close(h)
+    
+    ms = (b-a)/1000000
+    print(f"SPI took {ms} ms to make {n} writes, i.e. {1000*n/ms} writes a second")
+    
+        
+def time_bang():
+    bang_data = [tuple(map(int, tuple(f'{i:016b}'))) for i in range(n)]
+    print("timing bit bang...")
+    a = time.time_ns()
+    for data in bang_data:
+        bang(data)
+    b = time.time_ns()
+    ms = (b-a)/1000000
+    print(f"bit bang took {ms} ms to make {n} writes, i.e. {1000*n/ms} writes a second")
 
 # bit bang a moving light pattern
 def knightrider():
