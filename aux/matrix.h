@@ -1,3 +1,6 @@
+#ifndef MATRIX_H
+#define MATRIX_H
+
 typedef struct {
     int out;
     int in;
@@ -7,5 +10,7 @@ typedef struct {
 
 void init();
 void cleanup();
-void poll(Matrix *mat);
-void printmat(Matrix *mat);
+void poll(Matrix *);
+void printmat(Matrix *);
+
+#endif
