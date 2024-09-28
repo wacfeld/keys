@@ -4,6 +4,7 @@
 #include <RtAudio.h>
 #include <map>
 #include <signal.h>
+#include <atomic>
 
 #include "matrix.h"
 
@@ -36,12 +37,15 @@ double freqs[N_KEYS] = {
 
 static volatile int stop = 0;
 
+std::map<int, SineWave> data[2];
+std::atomic<int> data_i;
+
 // ctrl-c handler
 void handler(int s) {
     stop = 1;
 }
 
-void init(RtAudio *out, callback f, void *data) {
+void init(RtAudio *out, callback f) {
     Stk::setSampleRate(44100.0);
     RtAudio::StreamParameters params;
     params.deviceId = out->getDefaultOutputDevice();
@@ -49,7 +53,7 @@ void init(RtAudio *out, callback f, void *data) {
     RtAudioFormat format = (sizeof(StkFloat) == 8) ? RTAUDIO_FLOAT64 : RTAUDIO_FLOAT32;
     uint frames = RT_BUFFER_SIZE;
 
-    if(out->openStream(&params, NULL, format, (uint) Stk::sampleRate(), &frames, f, data)) {
+    if(out->openStream(&params, NULL, format, (uint) Stk::sampleRate(), &frames, f, NULL)) {
         std::cout << out->getErrorText() << std::endl;
         exit(1);
     }
@@ -61,8 +65,8 @@ void cleanup(RtAudio *out) {
     }
 }
 
-int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    std::map<int, SineWave> *dat = (std::map<int, SineWave> *) data;
+int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *temp) {
+    std::map<int, SineWave> *dat = &data[data_i];
     StkFloat *out = (StkFloat *) output;
 
     for(unsigned long int i = 0; i < nframes; i++) {
@@ -77,35 +81,46 @@ int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStre
 }
 
 // poll the matrix and update the data accordingly
-void update(std::map<int, SineWave> *data, Matrix *mat) {
+void update(Matrix *mat) {
+    // make the unused map the current one and copy everything from the other map
+    int cur = 1-data_i;
+    int old = data_i;
+    data[cur] = data[old];
 
     // check the status of every key against the hash map
+    int changed = 0;
     poll(mat);
     //printmat(mat);
     for(int i = 0; i < mat->keys; i++) {
         // key was just pressed, add a sine to the map
-        if(mat->buf[i] == 1 && data->count(i) == 0) {
-            (*data)[i] = SineWave();
-            (*data)[i].setFrequency(freqs[i]);
+        if(mat->buf[i] == 1 && data[cur].count(i) == 0) {
+            changed = 1;
+            data[cur][i] = SineWave();
+            data[cur][i].setFrequency(freqs[i]);
         }
 
         // key was just released, remove it from the map
-        else if(mat->buf[i] == 0 && data->count(i) > 0) {
-            data->erase(i);
+        else if(mat->buf[i] == 0 && data[cur].count(i) > 0) {
+            changed = 1;
+            data[cur].erase(i);
         }
+    }
+
+    if(changed) {
+        data_i = cur;
     }
 }
 
 int main()
 {
+    data_i = 0;
     RtAudio out;
-    std::map<int, SineWave> data;
     
     char buf[N_KEYS];
     Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
 
     initMatrix();
-    init(&out, tick, (void*) &data);
+    init(&out, tick);
     gpioSetSignalFunc(SIGINT, handler);
 
     if(out.startStream()) {
@@ -114,7 +129,7 @@ int main()
     }
 
     while(!stop) {
-        update(&data, &mat);
+        update(&mat);
     }
 
     cleanup(&out);
