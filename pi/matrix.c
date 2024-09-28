@@ -6,7 +6,7 @@
 // - the 595 is CE0
 // - the 165 is CE1
 
-#define NKEYS 24
+#define NKEYS 25
 
 typedef struct {
     int out;
