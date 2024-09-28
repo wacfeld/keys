@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <pigpio.h>
-#include <unistd.h>
 
 // SPI handles
 static int OUT, IN;

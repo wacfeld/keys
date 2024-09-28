@@ -11,7 +11,7 @@
 #define N_IN 5
 
 // e to e containing middle c
-double freqs[NKEYS] = {
+double freqs[N_KEYS] = {
     164.8138, 169.6432,
     174.6141, 179.7307,
     184.9972, 190.4180,
@@ -54,10 +54,15 @@ void cleanup(RtAudio *out) {
 }
 
 int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    SineWave *sine = (SineWave *) data;
+    std::map<int, SineWave> *dat = (std::map<int, SineWave> *) data;
     StkFloat *out = (StkFloat *) output;
+
     for(unsigned long int i = 0; i < nframes; i++) {
-        *out = sine->tick();
+        StkFloat val = 0;
+        for(auto it = dat->begin(); it != dat->end(); it++) {
+            val += it->second.tick();
+        }
+        *out = val;
         out++;
     }
     return 0;
@@ -69,13 +74,13 @@ void update(std::map<int, SineWave> &&data, Matrix *mat) {
     // check the status of every key against the hash map
     poll(mat);
     for(int i = 0; i < mat->keys; i++) {
-        // key was just pressed
+        // key was just pressed, add a sine to the map
         if(mat->buf[i] == 1 && data.count(i) == 0) {
             data[i] = SineWave();
             data[i].setFrequency(freqs[i]);
         }
 
-        // key was just released
+        // key was just released, remove it from the map
         else if(mat->buf[i] == 0 && data.count(i) > 0) {
             data.erase(i);
         }
@@ -89,7 +94,7 @@ int main()
     std::map<int, SineWave> data;
     
     char buf[N_KEYS];
-    Matrix *mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
+    Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
 
     initMatrix();
     init(&out, tick, (void*) &data);
