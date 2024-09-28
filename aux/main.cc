@@ -70,7 +70,7 @@ int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStre
         for(auto it = dat->begin(); it != dat->end(); it++) {
             val += it->second.tick();
         }
-        *out = val;
+        *out = val / (N_KEYS+1);
         out++;
     }
     return 0;
@@ -81,7 +81,7 @@ void update(std::map<int, SineWave> *data, Matrix *mat) {
 
     // check the status of every key against the hash map
     poll(mat);
-    printmat(mat);
+    //printmat(mat);
     for(int i = 0; i < mat->keys; i++) {
         // key was just pressed, add a sine to the map
         if(mat->buf[i] == 1 && data->count(i) == 0) {

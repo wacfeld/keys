@@ -1,7 +1,6 @@
 #include "matrix.h"
 
 #include <stdio.h>
-#include <pigpio.h>
 
 // SPI handles
 static int OUT, IN;
