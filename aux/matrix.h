@@ -1,5 +1,6 @@
 #ifndef MATRIX_H
 #define MATRIX_H
+#include <pigpio.h>
 
 typedef struct {
     int out;

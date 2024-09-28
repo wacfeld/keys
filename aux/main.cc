@@ -3,12 +3,19 @@
 #include <SineWave.h>
 #include <RtAudio.h>
 #include <map>
+#include <signal.h>
 
 #include "matrix.h"
 
 #define N_KEYS 25
 #define N_OUT 5
 #define N_IN 5
+
+using namespace stk;
+typedef unsigned int uint;
+
+// make an alias for the callback function prototype used by stk (tick() is an example)
+typedef int (*callback)(void*, void*, uint, double, RtAudioStreamStatus, void*);
 
 // e to e containing middle c
 double freqs[N_KEYS] = {
@@ -27,11 +34,12 @@ double freqs[N_KEYS] = {
     329.6276
 };
 
-using namespace stk;
-typedef unsigned int uint;
+static volatile int stop = 0;
 
-// make an alias for the callback function prototype used by stk (tick() is an example)
-typedef int (*callback)(void*, void*, uint, double, RtAudioStreamStatus, void*);
+// ctrl-c handler
+void handler(int s) {
+    stop = 1;
+}
 
 void init(RtAudio *out, callback f, void *data) {
     Stk::setSampleRate(44100.0);
@@ -69,20 +77,21 @@ int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStre
 }
 
 // poll the matrix and update the data accordingly
-void update(std::map<int, SineWave> &&data, Matrix *mat) {
+void update(std::map<int, SineWave> *data, Matrix *mat) {
 
     // check the status of every key against the hash map
     poll(mat);
+    printmat(mat);
     for(int i = 0; i < mat->keys; i++) {
         // key was just pressed, add a sine to the map
-        if(mat->buf[i] == 1 && data.count(i) == 0) {
-            data[i] = SineWave();
-            data[i].setFrequency(freqs[i]);
+        if(mat->buf[i] == 1 && data->count(i) == 0) {
+            (*data)[i] = SineWave();
+            (*data)[i].setFrequency(freqs[i]);
         }
 
         // key was just released, remove it from the map
-        else if(mat->buf[i] == 0 && data.count(i) > 0) {
-            data.erase(i);
+        else if(mat->buf[i] == 0 && data->count(i) > 0) {
+            data->erase(i);
         }
     }
 }
@@ -90,7 +99,6 @@ void update(std::map<int, SineWave> &&data, Matrix *mat) {
 int main()
 {
     RtAudio out;
-
     std::map<int, SineWave> data;
     
     char buf[N_KEYS];
@@ -98,15 +106,18 @@ int main()
 
     initMatrix();
     init(&out, tick, (void*) &data);
+    gpioSetSignalFunc(SIGINT, handler);
 
-    //if(out.startStream()) {
-    //    std::cout << out.getErrorText() << std::endl;
-    //    exit(1);
-    //}
+    if(out.startStream()) {
+        std::cout << out.getErrorText() << std::endl;
+        exit(1);
+    }
+
+    while(!stop) {
+        update(&data, &mat);
+    }
 
     cleanup(&out);
-
     cleanupMatrix();
-
     return 0;
 }
