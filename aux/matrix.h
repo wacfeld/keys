@@ -8,8 +8,8 @@ typedef struct {
     char *buf;
 } Matrix;
 
-void init();
-void cleanup();
+void initMatrix();
+void cleanupMatrix();
 void poll(Matrix *);
 void printmat(Matrix *);
 

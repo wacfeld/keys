@@ -7,7 +7,8 @@
 // SPI handles
 static int OUT, IN;
 
-void init() {
+// init pigpio and SPI
+void initMatrix() {
     gpioInitialise();
 
     // assumptions:
@@ -19,8 +20,8 @@ void init() {
     IN  = spiOpen(1, 1000000, 8);
 }
 
-void cleanup() {
-    // cleanup
+// cleanup pigpio and SPI
+void cleanupMatrix() {
     spiClose(OUT);
     spiClose(IN);
     gpioTerminate();
