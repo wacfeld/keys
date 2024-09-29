@@ -21,6 +21,8 @@ using namespace stk;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
+typedef std::multimap<int, std::unique_ptr<Generator>> wavemap;
+
 // make an alias for the callback function prototype used by stk (tick() is an example)
 typedef int (*callback)(void*, void*, uint, double, RtAudioStreamStatus, void*);
 
@@ -68,24 +70,32 @@ void cleanup(RtAudio *out) {
     }
 }
 
+void press(wavemap *map, int i) {
+    std::unique_ptr<SineWave> si{new SineWave};
+    si->setFrequency(freqs[i]*1.3333333);
+    map->emplace(i, std::move(si));
+
+    std::unique_ptr<BlitSquare> sq{new BlitSquare};
+    sq->setFrequency(freqs[i]);
+    map->emplace(i, std::move(sq));
+}
+
+void unpress(wavemap *map, int i) {
+    map->erase(i);
+}
+
 int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    static std::multimap<int, std::unique_ptr<Generator>> map;
+    static wavemap map;
     auto buf = (std::atomic<char> *) data;
     
     for(int i = 0; i < N_KEYS; i++) {
         // key was just pressed
         if(buf[i] == 1 && map.count(i) == 0) {
-            std::unique_ptr<SineWave> si{new SineWave};
-            si->setFrequency(freqs[i]*1.5);
-            map.emplace(i, std::move(si));
-
-            std::unique_ptr<BlitSquare> sq{new BlitSquare};
-            sq->setFrequency(freqs[i]);
-            map.emplace(i, std::move(sq));
+            press(&map, i);
         }
         // key was just released
         else if(buf[i] == 0 && map.count(i) > 0) {
-            map.erase(i);
+            unpress(&map, i);
         }
     }
 
