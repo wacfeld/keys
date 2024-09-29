@@ -1,11 +1,14 @@
 #define __OS_LINUX__
 
 #include <SineWave.h>
+#include <BlitSquare.h>
 #include <RtAudio.h>
 #include <map>
 #include <signal.h>
+#include <Generator.h>
 #include <atomic>
 #include <math.h>
+#include <memory>
 
 #include "matrix.h"
 #include "utils.h"
@@ -66,14 +69,19 @@ void cleanup(RtAudio *out) {
 }
 
 int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    static std::map<int, SineWave> map;
+    static std::multimap<int, std::unique_ptr<Generator>> map;
     auto buf = (std::atomic<char> *) data;
     
     for(int i = 0; i < N_KEYS; i++) {
         // key was just pressed
         if(buf[i] == 1 && map.count(i) == 0) {
-            map[i] = SineWave();
-            map[i].setFrequency(freqs[i]);
+            std::unique_ptr<SineWave> si{new SineWave};
+            si->setFrequency(freqs[i]*1.5);
+            map.emplace(i, std::move(si));
+
+            std::unique_ptr<BlitSquare> sq{new BlitSquare};
+            sq->setFrequency(freqs[i]);
+            map.emplace(i, std::move(sq));
         }
         // key was just released
         else if(buf[i] == 0 && map.count(i) > 0) {
@@ -88,7 +96,7 @@ int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStre
     //ulong a = gettime();
     for(auto it = map.begin(); it != map.end(); it++) {
         StkFrames voice(nframes, 1);
-        it->second.tick(voice);
+        it->second->tick(voice);
         frames += voice;
     }
     //ulong b = gettime();
