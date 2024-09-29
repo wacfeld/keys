@@ -2,28 +2,29 @@
 
 #include <Stk.h>
 #include <RtAudio.h>
+#include <Envelope.h>
 
 #include "wavetable.h"
 #include "matrix.h"
 
-//typedef std::multimap<int, std::unique_ptr<Generator>> wavemap;
-
-void press(wavemap *map, int i) {
-    std::unique_ptr<SineWave> si{new SineWave};
-    si->setFrequency(freqs[i]*1.3333333);
-    map->emplace(i, std::move(si));
-
-    std::unique_ptr<BlitSquare> sq{new BlitSquare};
-    sq->setFrequency(freqs[i]);
-    map->emplace(i, std::move(sq));
+WavData::WavData(Matrix *mat, double freqs) {
+    this->mat = mat;
+    int n = mat->keys;
+    this->envs = new Envelope[n];
+    this->
 }
 
-void unpress(wavemap *map, int i) {
-    map->erase(i);
+WavData wav_init(Matrix *mat) {
+    int n = mat->keys;
+    WavData wd;
+    wd.envs = new Envelope
 }
 
-int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
+int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
+    static Envelope 
     Matrix *mat = (Matrix *) data;
+
+    std::set<int> held; // set of currently held note indices
     
     for(int i = 0; i < mat->keys; i++) {
         // key was just pressed
