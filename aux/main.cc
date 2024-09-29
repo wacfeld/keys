@@ -85,14 +85,14 @@ int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStre
     StkFrames frames(nframes, 1);
 
 
+    //ulong a = gettime();
     for(auto it = map.begin(); it != map.end(); it++) {
         StkFrames voice(nframes, 1);
-    ulong a = gettime();
         it->second.tick(voice);
-    ulong b = gettime();
-    elapsed(a,b);
         frames += voice;
     }
+    //ulong b = gettime();
+    //elapsed(a,b);
     
     for(ulong i = 0; i < nframes; i++) {
         out[i] = frames[i] / (N_KEYS+1);
@@ -109,13 +109,7 @@ void printframes(StkFrames frames) {
 
 int main()
 {
-    SineWave wav;
-    //wav.setFrequency(440);
-    timeit(wav.tick(), 100);
-    timeit(i+1, 100);
-    
     RtAudio out;
-    return 0;
     
     std::atomic<char> buf[N_KEYS];
     Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
