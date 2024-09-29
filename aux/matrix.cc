@@ -6,7 +6,7 @@
 static int OUT, IN;
 
 // init pigpio and SPI
-void initMatrix() {
+void initMatrix(int baud) {
     gpioInitialise();
 
     // assumptions:
@@ -14,8 +14,8 @@ void initMatrix() {
     // - the 165 is CE1
     // 8 = 0b1000 means that CE0 is active low and CE1 is active high
     // since the latch is low when shifting out to the 595 and high when shifting in from the 165
-    OUT = spiOpen(0, 1000000, 8);
-    IN  = spiOpen(1, 1000000, 8);
+    OUT = spiOpen(0, baud, 8);
+    IN  = spiOpen(1, baud, 8);
 }
 
 // cleanup pigpio and SPI
@@ -44,7 +44,7 @@ void poll(Matrix *mat) {
 
 void printmat(Matrix *mat) {
     for(int i = 0; i < mat->keys; i++) {
-        printf("%d", mat->buf[i]);
+        printf("%d", (int) mat->buf[i]);
     }
     putchar('\n');
 }

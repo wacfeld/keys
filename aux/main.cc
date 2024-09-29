@@ -4,8 +4,10 @@
 #include <RtAudio.h>
 #include <map>
 #include <signal.h>
+#include <atomic>
 
 #include "matrix.h"
+#include "utils.h"
 
 #define N_KEYS 25
 #define N_OUT 5
@@ -13,6 +15,7 @@
 
 using namespace stk;
 typedef unsigned int uint;
+typedef unsigned long ulong;
 
 // make an alias for the callback function prototype used by stk (tick() is an example)
 typedef int (*callback)(void*, void*, uint, double, RtAudioStreamStatus, void*);
@@ -62,50 +65,46 @@ void cleanup(RtAudio *out) {
 }
 
 int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    std::map<int, SineWave> *dat = (std::map<int, SineWave> *) data;
+    //ulong a = gettime();
+    static std::map<int, SineWave> map;
+    auto buf = (std::atomic<char> *) data;
+    
+    for(int i = 0; i < N_KEYS; i++) {
+        // key was just pressed
+        if(buf[i] == 1 && map.count(i) == 0) {
+            map[i] = SineWave();
+            map[i].setFrequency(freqs[i]);
+        }
+        // key was just released
+        else if(buf[i] == 0 && map.count(i) > 0) {
+            map.erase(i);
+        }
+    }
+
     StkFloat *out = (StkFloat *) output;
 
     for(unsigned long int i = 0; i < nframes; i++) {
         StkFloat val = 0;
-        for(auto it = dat->begin(); it != dat->end(); it++) {
+        for(auto it = map.begin(); it != map.end(); it++) {
             val += it->second.tick();
         }
         *out = val / (N_KEYS+1);
         out++;
     }
+    //ulong b = gettime();
+    //elapsed(a,b);
     return 0;
-}
-
-// poll the matrix and update the data accordingly
-void update(std::map<int, SineWave> *data, Matrix *mat) {
-
-    // check the status of every key against the hash map
-    poll(mat);
-    //printmat(mat);
-    for(int i = 0; i < mat->keys; i++) {
-        // key was just pressed, add a sine to the map
-        if(mat->buf[i] == 1 && data->count(i) == 0) {
-            (*data)[i] = SineWave();
-            (*data)[i].setFrequency(freqs[i]);
-        }
-
-        // key was just released, remove it from the map
-        else if(mat->buf[i] == 0 && data->count(i) > 0) {
-            data->erase(i);
-        }
-    }
 }
 
 int main()
 {
     RtAudio out;
-    std::map<int, SineWave> data;
     
-    char buf[N_KEYS];
+    std::atomic<char> buf[N_KEYS];
     Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
 
-    initMatrix();
-    init(&out, tick, (void*) &data);
+    initMatrix(5000000);
+    init(&out, tick, (void*) buf);
     gpioSetSignalFunc(SIGINT, handler);
 
     if(out.startStream()) {
@@ -114,7 +113,7 @@ int main()
     }
 
     while(!stop) {
-        update(&data, &mat);
+        poll(&mat);
     }
 
     cleanup(&out);
