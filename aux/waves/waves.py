@@ -1,5 +1,6 @@
 import struct
 import numpy as np
+from viz import plot
 
 ## write data
 
@@ -17,7 +18,14 @@ def write(fname, data):
     with open(fname, 'wb') as file:
         file.write(content)
 
-## common waves
+## operators
+
+def double(data):
+    # every other element
+    half = data[::2]
+    return np.concatenate((half, half))
+
+## basic waves
 
 def square():
     data = (32767,) * 512 + (-32767,) * 512
@@ -31,4 +39,10 @@ def sawtooth():
     data = [32767*i//512 for i in range(512)] + [32767*i//512 - 32767 for i in range(512)]
     return np.array(data)
 
-## uncommon waves
+## sophisticated waves
+
+def marimba():
+    tri = triangle()
+    # triangle wave tuned up 2 octaves
+    tri4 = double(double(triangle()))
+    return (tri + tri4) / 2
