@@ -27,4 +27,8 @@ def triangle():
     data = [32767*i//256 for i in range(256)] + [-32767*i//256 + 32767 for i in range(512)] + [32767*i//256 - 32767 for i in range(256)]
     return np.array(data)
 
+def sawtooth():
+    data = [32767*i//512 for i in range(512)] + [32767*i//512 - 32767 for i in range(512)]
+    return np.array(data)
+
 ## uncommon waves
