@@ -1,6 +1,15 @@
 #!/bin/env python
 
 import sys
+import struct
 
-if len(sys.argv) == 1:
+if len(sys.argv) != 2:
     print(f"Usage: {sys.argv[0]} FILENAME\nwhere FILENAME contains big-endian 16-bit raw data")
+    exit(1)
+
+fname = sys.argv[1]
+with open(fname, mode='rb') as file:
+    content = file.read()
+
+data = struct.unpack(">" + "h" * (len(content)//2), content)
+print(data)
