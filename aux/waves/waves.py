@@ -13,3 +13,6 @@ def write(fname, data):
     print(f'writing {len(data)} samples to {fname}')
     with open(fname, 'wb') as file:
         file.write(content)
+
+def squarewave():
+    data = (32767,) * 512 + (-32767,) * 512
