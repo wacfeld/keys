@@ -22,7 +22,7 @@ WavData::WavData(FileLoop wave, ADSR env, Matrix *mat, double *freqs) {
         //this->waves[i].reset();
 
         // create corresponding copy of the envelope
-        this->envs.push_back(ADSR());
+        this->envs.push_back(env);
     }
 }
 
@@ -51,14 +51,17 @@ int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudio
 
     //compute frames for each note and add to total
     for(int i = 0; i < dat->n; i++) {
-        if(dat->held.count(i)) {
         StkFrames wav(nframes, 1);
         StkFrames env(nframes, 1);
         dat->waves[i].tick(wav);
         dat->envs[i].tick(env);
+        if(i == 0) {
+            for(unsigned long j = 0; j < nframes; j++) {
+                printf("%f\n", env[j]);
+            }
+        }
         wav *= env;
         frames += wav;
-        }
     }
 
     // write to output buffer and scale down to be within +/-1
