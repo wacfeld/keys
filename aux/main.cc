@@ -73,19 +73,21 @@ void printframes(StkFrames frames) {
 void runWave() {
     RtAudio out;
     
-    // keyboard matrix
+    // initialize elements of WavData (matrix, envelope, waveform)
     std::atomic<char> buf[N_KEYS];
     Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
     initMatrix(5000000);
+    gpioSetSignalFunc(SIGINT, handler); // override pigpio's signal handler
 
     FileLoop wave("samples/sinewave.raw", true);
     ADSR env;
     env.setAllTimes(0.5, 0.5, 1, 0.5);
     
+    // create WavData
     WavData data(wave, env, &mat, freqs);
 
+    // pass tick function and data to init()
     init(&out, wav_tick, (void*) &data);
-    gpioSetSignalFunc(SIGINT, handler);
 
     if(out.startStream()) {
         std::cout << out.getErrorText() << std::endl;

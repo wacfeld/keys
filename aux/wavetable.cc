@@ -55,11 +55,6 @@ int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudio
         StkFrames env(nframes, 1);
         dat->waves[i].tick(wav);
         dat->envs[i].tick(env);
-        if(i == 0) {
-            for(unsigned long j = 0; j < nframes; j++) {
-                printf("%f\n", env[j]);
-            }
-        }
         wav *= env;
         frames += wav;
     }
