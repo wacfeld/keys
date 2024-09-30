@@ -83,6 +83,7 @@ void runWave() {
 
     FileLoop wave("samples/sinewave.raw", true);
     ADSR env;
+    env.setAllTimes(0.5, 0.5, 0.5, 0.5);
     
     WavData data(wave, env, &mat, freqs);
 
@@ -161,6 +162,6 @@ void runOld() {
 
 int main()
 {
-    runOld();
+    runWave();
     return 0;
 }

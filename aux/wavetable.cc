@@ -4,6 +4,7 @@
 #include <RtAudio.h>
 
 #include "wavetable.h"
+#include "utils.h"
 #include "matrix.h"
 
 using namespace stk;
@@ -26,6 +27,7 @@ WavData::WavData(FileLoop wave, ADSR env, Matrix *mat, double *freqs) {
 }
 
 int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
+    //ulong a = gettime();
     auto dat = (WavData *) data;
 
     // update held keys and trigger envelopes accordingly
@@ -47,27 +49,25 @@ int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudio
 
     StkFrames frames(nframes, 1);
 
-    //ulong a = gettime();
-
     //compute frames for each note and add to total
     for(int i = 0; i < dat->n; i++) {
         if(dat->held.count(i)) {
         StkFrames wav(nframes, 1);
         StkFrames env(nframes, 1);
         dat->waves[i].tick(wav);
-        dat->waves[i].tick(env);
-        //wav *= env;
+        dat->envs[i].tick(env);
+        wav *= env;
         frames += wav;
         }
     }
-
-    //ulong b = gettime();
-    //elapsed(a,b);
 
     // write to output buffer and scale down to be within +/-1
     for(ulong i = 0; i < nframes; i++) {
         out[i] = frames[i] / (dat->n+1);
     }
+    //ulong b = gettime();
+    //elapsed(a,b);
+
     return 0;
 }
 
