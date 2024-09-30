@@ -72,19 +72,19 @@ void printframes(StkFrames frames) {
 }
 
 void runWave(int argc, char **argv) {
-    double attack=0, decay=5, sustain=0, release=0.5;
+    double attack=0, decay=5, sustain=0.1, release=0.5;
 
-    std::string fname;
+    std::string fname = "waves/sinewave.raw";
     static char usage[] = "-f: raw file name\n-a: attack\n-d: decay\n-s: sustain\n-r: release\n";
 
     int opt;
     while((opt = getopt(argc, argv, "a:d:s:r:f:")) != -1) {
         switch(opt) {
         case 'f': fname = optarg; break;
-        case 'a': scanf("%lf", &attack); break;
-        case 'd': scanf("%lf", &decay); break;
-        case 's': scanf("%lf", &sustain); break;
-        case 'r': scanf("%lf", &release); break;
+        case 'a': sscanf(optarg, "%lf", &attack); break;
+        case 'd': sscanf(optarg, "%lf", &decay); break;
+        case 's': sscanf(optarg, "%lf", &sustain); break;
+        case 'r': sscanf(optarg, "%lf", &release); break;
         default: printf("%s", usage); exit(1);
         }
     }
@@ -95,9 +95,9 @@ void runWave(int argc, char **argv) {
     initMatrix(5000000);
     gpioSetSignalFunc(SIGINT, handler); // override pigpio's signal handler
 
-    FileLoop wave("samples/sinewave.raw", true);
+    FileLoop wave(fname, true);
     ADSR env;
-    env.setAllTimes(0.5, 0.5, 1, 0.5);
+    env.setAllTimes(attack, decay, sustain, release);
     
     // create WavData
     WavData data(wave, env, &mat, freqs);
