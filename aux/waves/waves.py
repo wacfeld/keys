@@ -1,4 +1,7 @@
 import struct
+import numpy as np
+
+## write data
 
 # write binary data to file
 # data is a list of numbers
@@ -14,10 +17,14 @@ def write(fname, data):
     with open(fname, 'wb') as file:
         file.write(content)
 
+## common waves
+
 def square():
     data = (32767,) * 512 + (-32767,) * 512
-    return data
+    return np.array(data)
 
 def triangle():
     data = [32767*i//256 for i in range(256)] + [-32767*i//256 + 32767 for i in range(512)] + [32767*i//256 - 32767 for i in range(256)]
-    return data
+    return np.array(data)
+
+## uncommon waves
