@@ -3,6 +3,7 @@
 #include <RtAudio.h>
 #include <signal.h>
 #include <atomic>
+#include <unistd.h>
 
 #include "matrix.h"
 #include "utils.h"
@@ -70,8 +71,23 @@ void printframes(StkFrames frames) {
     putchar('\n');
 }
 
-void runWave() {
-    RtAudio out;
+void runWave(int argc, char **argv) {
+    double attack=0, decay=5, sustain=0, release=0.5;
+
+    std::string fname;
+    static char usage[] = "-f: raw file name\n-a: attack\n-d: decay\n-s: sustain\n-r: release\n";
+
+    int opt;
+    while((opt = getopt(argc, argv, "a:d:s:r:f:")) != -1) {
+        switch(opt) {
+        case 'f': fname = optarg; break;
+        case 'a': scanf("%lf", &attack); break;
+        case 'd': scanf("%lf", &decay); break;
+        case 's': scanf("%lf", &sustain); break;
+        case 'r': scanf("%lf", &release); break;
+        default: printf("%s", usage); exit(1);
+        }
+    }
     
     // initialize elements of WavData (matrix, envelope, waveform)
     std::atomic<char> buf[N_KEYS];
@@ -86,7 +102,8 @@ void runWave() {
     // create WavData
     WavData data(wave, env, &mat, freqs);
 
-    // pass tick function and data to init()
+    // init() with tick function and data
+    RtAudio out;
     init(&out, wav_tick, (void*) &data);
 
     if(out.startStream()) {
@@ -102,8 +119,8 @@ void runWave() {
     cleanupMatrix();
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    runWave();
+    runWave(argc, argv);
     return 0;
 }
