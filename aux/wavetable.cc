@@ -2,27 +2,30 @@
 
 #include <Stk.h>
 #include <RtAudio.h>
-#include <Envelope.h>
+#include <set>
 
 #include "wavetable.h"
 #include "matrix.h"
 
-WavData::WavData(Matrix *mat, double freqs) {
+WavData::WavData(stk::FileLoop wave, stk::ADSR env, Matrix *mat, double *freqs) {
+    // process matrix info
     this->mat = mat;
     int n = mat->keys;
-    this->envs = new Envelope[n];
-    this->
-}
 
-WavData wav_init(Matrix *mat) {
-    int n = mat->keys;
-    WavData wd;
-    wd.envs = new Envelope
+    // initialize FileLoops and ADSRs
+    for(int i = 0; i < n; i++) {
+        // create a copy of the wave, give it its own frequecny, and reset it for good measure
+        this->waves.push_back(wave);
+        this->waves[i].setFrequency(freqs[i]);
+        this->waves[i].reset();
+
+        // create corresponding copy of the envelope
+        this->envs.push_back(stk::ADSR());
+    }
 }
 
 int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    static Envelope 
-    Matrix *mat = (Matrix *) data;
+    dat = (WavData *) data;
 
     std::set<int> held; // set of currently held note indices
     

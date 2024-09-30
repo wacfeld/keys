@@ -1,15 +1,8 @@
 #define __OS_LINUX__
 
-#include <SineWave.h>
-#include <BlitSquare.h>
 #include <RtAudio.h>
-#include <map>
 #include <signal.h>
-#include <Generator.h>
 #include <atomic>
-#include <math.h>
-#include <memory>
-#include <Envelope.h>
 
 #include "matrix.h"
 #include "utils.h"
