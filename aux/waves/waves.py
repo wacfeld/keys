@@ -14,5 +14,10 @@ def write(fname, data):
     with open(fname, 'wb') as file:
         file.write(content)
 
-def squarewave():
+def square():
     data = (32767,) * 512 + (-32767,) * 512
+    return data
+
+def triangle():
+    data = [32767*i//256 for i in range(256)] + [-32767*i//256 + 32767 for i in range(512)] + [32767*i//256 - 32767 for i in range(256)]
+    return data
