@@ -2,59 +2,71 @@
 
 #include <Stk.h>
 #include <RtAudio.h>
-#include <set>
 
 #include "wavetable.h"
 #include "matrix.h"
 
-WavData::WavData(stk::FileLoop wave, stk::ADSR env, Matrix *mat, double *freqs) {
+using namespace stk;
+
+WavData::WavData(FileLoop wave, ADSR env, Matrix *mat, double *freqs) {
     // process matrix info
     this->mat = mat;
-    int n = mat->keys;
+    this->n = mat->keys;
 
     // initialize FileLoops and ADSRs
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < this->n; i++) {
         // create a copy of the wave, give it its own frequecny, and reset it for good measure
         this->waves.push_back(wave);
         this->waves[i].setFrequency(freqs[i]);
-        this->waves[i].reset();
+        //this->waves[i].reset();
 
         // create corresponding copy of the envelope
-        this->envs.push_back(stk::ADSR());
+        this->envs.push_back(ADSR());
     }
 }
 
 int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
-    dat = (WavData *) data;
+    auto dat = (WavData *) data;
 
-    std::set<int> held; // set of currently held note indices
-    
-    for(int i = 0; i < mat->keys; i++) {
+    // update held keys and trigger envelopes accordingly
+    for(int i = 0; i < dat->mat->keys; i++) {
         // key was just pressed
-        if(buf[i] == 1 && map.count(i) == 0) {
-            press(&map, i);
+        if(dat->mat->buf[i] == 1 && dat->held.count(i) == 0) {
+            dat->held.insert(i);
+            dat->envs[i].keyOn();
         }
         // key was just released
-        else if(buf[i] == 0 && map.count(i) > 0) {
-            unpress(&map, i);
+        else if(dat->mat->buf[i] == 0 && dat->held.count(i) > 0) {
+            dat->held.erase(i);
+            dat->envs[i].keyOff();
         }
     }
 
-    StkFloat *out = (StkFloat *) output;
+    // compute output
+    auto out = (StkFloat *) output;
+
     StkFrames frames(nframes, 1);
 
-
     //ulong a = gettime();
-    for(auto it = map.begin(); it != map.end(); it++) {
-        StkFrames voice(nframes, 1);
-        it->second->tick(voice);
-        frames += voice;
+
+    //compute frames for each note and add to total
+    for(int i = 0; i < dat->n; i++) {
+        if(dat->held.count(i)) {
+        StkFrames wav(nframes, 1);
+        StkFrames env(nframes, 1);
+        dat->waves[i].tick(wav);
+        dat->waves[i].tick(env);
+        //wav *= env;
+        frames += wav;
+        }
     }
+
     //ulong b = gettime();
     //elapsed(a,b);
-    
+
+    // write to output buffer and scale down to be within +/-1
     for(ulong i = 0; i < nframes; i++) {
-        out[i] = frames[i] / (mat->keys+1);
+        out[i] = frames[i] / (dat->n+1);
     }
     return 0;
 }

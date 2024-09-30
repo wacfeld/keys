@@ -74,11 +74,17 @@ int main()
 {
     RtAudio out;
     
+    // keyboard matrix
     std::atomic<char> buf[N_KEYS];
     Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
-
     initMatrix(5000000);
-    init(&out, tick, (void*) &mat);
+
+    FileLoop wave("samples/sinewave.raw", true);
+    ADSR env;
+    
+    WavData data(wave, env, &mat, freqs);
+
+    init(&out, wav_tick, (void*) &data);
     gpioSetSignalFunc(SIGINT, handler);
 
     if(out.startStream()) {
