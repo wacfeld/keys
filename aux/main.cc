@@ -4,6 +4,9 @@
 #include <signal.h>
 #include <atomic>
 
+#include <map>
+#include <SineWave.h>
+
 #include "matrix.h"
 #include "utils.h"
 #include "wavetable.h"
@@ -70,8 +73,7 @@ void printframes(StkFrames frames) {
     putchar('\n');
 }
 
-int main()
-{
+void runWave() {
     RtAudio out;
     
     // keyboard matrix
@@ -98,5 +100,67 @@ int main()
 
     cleanup(&out);
     cleanupMatrix();
+}
+
+int tick(void *output, void *input, uint nframes, double streamTime, RtAudioStreamStatus status, void *data) {
+    static std::map<int, SineWave> map;
+    auto buf = (std::atomic<char> *) data;
+    
+    for(int i = 0; i < N_KEYS; i++) {
+        // key was just pressed
+        if(buf[i] == 1 && map.count(i) == 0) {
+            map[i] = SineWave();
+            map[i].setFrequency(freqs[i]);
+        }
+        // key was just released
+        else if(buf[i] == 0 && map.count(i) > 0) {
+            map.erase(i);
+        }
+    }
+
+    StkFloat *out = (StkFloat *) output;
+    StkFrames frames(nframes, 1);
+
+
+    for(auto it = map.begin(); it != map.end(); it++) {
+        StkFrames voice(nframes, 1);
+    ulong a = gettime();
+        it->second.tick(voice);
+    ulong b = gettime();
+    elapsed(a,b);
+        frames += voice;
+    }
+    
+    for(ulong i = 0; i < nframes; i++) {
+        out[i] = frames[i] / (N_KEYS+1);
+    }
+    return 0;
+}
+
+void runOld() {
+    RtAudio out;
+    std::atomic<char> buf[N_KEYS];
+    Matrix mat = {.out=N_OUT, .in=N_IN, .keys=N_KEYS, .buf=buf};
+
+    initMatrix(5000000);
+    init(&out, tick, (void*) buf);
+    gpioSetSignalFunc(SIGINT, handler);
+
+    if(out.startStream()) {
+        std::cout << out.getErrorText() << std::endl;
+        exit(1);
+    }
+
+    while(!stop) {
+        poll(&mat);
+    }
+
+    cleanup(&out);
+    cleanupMatrix();
+}
+
+int main()
+{
+    runOld();
     return 0;
 }
