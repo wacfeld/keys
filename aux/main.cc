@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <atomic>
 #include <unistd.h>
+#include <SineWave.h>
 
 #include "matrix.h"
 #include "utils.h"
@@ -72,7 +73,7 @@ void printframes(StkFrames frames) {
 }
 
 void runWave(int argc, char **argv) {
-    double attack=0, decay=5, sustain=0.1, release=0.5;
+    double attack=0.0001, decay=5, sustain=0.1, release=0.5;
 
     std::string fname = "waves/sine.raw";
     static char usage[] = "-f: raw file name\n-a: attack\n-d: decay\n-s: sustain\n-r: release\n";

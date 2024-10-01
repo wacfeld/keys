@@ -36,6 +36,7 @@ int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudio
         if(dat->mat->buf[i] == 1 && dat->held.count(i) == 0) {
             dat->held.insert(i);
             dat->envs[i].keyOn();
+            dat->waves[i].reset();
         }
         // key was just released
         else if(dat->mat->buf[i] == 0 && dat->held.count(i) > 0) {
