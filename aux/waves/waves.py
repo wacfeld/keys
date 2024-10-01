@@ -1,5 +1,4 @@
 import numpy as np
-import os
 
 from viz import plot, freqs
 from myio import read, write
@@ -14,8 +13,8 @@ def double(data):
 ## basic waves
 
 def sine():
-    data = np.sin(np.linspace(0, np.pi*2, 1024, endpoint=False))
-    return data
+    data = 32767 * np.sin(np.linspace(0, np.pi*2, 1024, endpoint=False))
+    return data.astype(int)
 
 def square():
     data = (32767,) * 512 + (-32767,) * 512

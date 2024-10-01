@@ -25,9 +25,33 @@ def plot(data, xdata=None, title=None, hlines=None):
             plt.axhline(y=y, color='black', lw=0.5, alpha=0.2)
     plt.show()
 
-def freqs(data, title=None):
+def freqs(data, title=None, threshold=0.001):
+    # take the fft, absolute value, and get the positive frequencies
     ft = np.abs(fft(data))
-    plot(ft[:len(ft)//2], title=title)
+    pos = ft[:len(ft)//2]
+
+    # remove trailing tiny values
+    if threshold != None:
+        # get max
+        m = np.max(pos)
+
+        # array of booleans flagging very small values
+        small = (pos/m < threshold)
+        # indices of non-small values
+        nonsmalls = np.where(np.logical_not(small))[0]
+        if len(nonsmalls) != 0:
+            # get index of last non-small value, add 2, and cap at length of array
+            i = min(nonsmalls[-1] + 2, len(pos))
+            pos = pos[:i]
+
+    pos = 10*np.log10(pos)
+
+    plt.plot(pos)
+    if title is not None:
+        plt.title(title)
+    plt.xlabel('Hz')
+    plt.ylabel('dB')
+    plt.show()
 
 if __name__ == '__main__':
     # enforce proper usage
