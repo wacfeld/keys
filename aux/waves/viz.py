@@ -5,17 +5,29 @@
 import sys
 import struct
 import matplotlib.pyplot as plt
+import numpy as np
+from numpy.fft import fft
 
-def plot(data, title=None):
+from myio import read
+
+def plot(data, xdata=None, title=None, hlines=None):
     # plot it
-    plt.plot(data)
+    if xdata is None:
+        plt.plot(data)
+    else:
+        plt.plot(xdata, data)
     plt.xlabel('sample')
     plt.ylabel('amplitude')
     if title is not None:
         plt.title(title)
-    for y in (0, 32767, -32767):
-        plt.axhline(y=y, color='black', lw=0.5, alpha=0.2)
+    if hlines is not None:
+        for y in hlines:
+            plt.axhline(y=y, color='black', lw=0.5, alpha=0.2)
     plt.show()
+
+def freqs(data, title=None):
+    ft = np.abs(fft(data))
+    plot(ft[:len(ft)//2], title=title)
 
 if __name__ == '__main__':
     # enforce proper usage
@@ -26,10 +38,7 @@ if __name__ == '__main__':
     # read and unpack data
     fname = sys.argv[1]
     opts = sys.argv[2:]
-    with open(fname, mode='rb') as file:
-        content = file.read()
-
-    data = struct.unpack('>' + 'h' * (len(content)//2), content)
+    data = read(fname)
 
     # print some info
     if '--print' in opts:
@@ -39,4 +48,7 @@ if __name__ == '__main__':
         print(f'starts with {data[0]}, ends with {data[-1]}')
         print(f'max {max(data)}, min {min(data)}')
 
-    plot(data, fname)
+    if '--freqs' in opts:
+        freqs(data, title=fname)
+    else:
+        plot(data, title=fname, hlines=(0, 32767, -32767))
