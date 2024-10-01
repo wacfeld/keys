@@ -28,12 +28,32 @@ Blanket::~Blanket(void) {
 
 void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
     if(!ignoreSampleRateChange_) {
-
+        sampleRate = newRate;
     }
 }
 
+// `shape` has form "opening;closing",
+// where opening and closing are comma separated lists of pairs,
+// where a pair has form "time:target",
+// where time and target are floats.
+//
+// notes:
+// - all times must be non-negative (measured in seconds) and all targets must be in [0,1]
+// - a time of zero means an instantaneous change to the target
+// - opening must have at least one pair
+// - the final target in opening is the sustain value
+// - if closing has no pairs, or has a nonzero final target, then it will automatically drop to zero after exhausting all pairs
+// - spaces are optional
+//
+// for example, "0.1:1, 0.2:0.5, 5:0.1; 1:0.05, 10:0" means:
+// - 0.1s to get to 1
+// - 0.2s to get to 0.5
+// - 5s to get to 0.1
+// - sustain at 0.1
+// - 1s to get to 0.05
+// - 10s to get to 0
 void Blanket::setShape(std::string shape) {
-
+    
 }
 
 stk::StkFloat Blanket::tick(void) {
