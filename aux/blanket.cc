@@ -43,6 +43,7 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
 // - opening must have at least one pair
 // - the final target in opening is the sustain value
 // - if closing has no pairs, or has a nonzero final target, then it will automatically drop to zero after exhausting all pairs
+// - the semicolon must still be present if closing is empty
 // - spaces are optional
 //
 // for example, "0.1:1, 0.2:0.5, 5:0.1; 1:0.05, 10:0" means:
@@ -52,8 +53,21 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
 // - sustain at 0.1
 // - 1s to get to 0.05
 // - 10s to get to 0
+//
+// "0:1;" means:
+// - instantaneously go to 1
+// - sustain at 1
+// - instantaneously go to 0
 void Blanket::setShape(std::string shape) {
-    
+    // get strings on either side of the semicolon
+    unsigned long i = shape.find(";");
+    if(i == shape.npos) {
+        std::cerr << "Blanket::setShape() could not find semicolon in the following string: " << shape << std::endl;
+    }
+    auto open = shape.substr(0, i);
+    auto close = shape.substr(i);
+
+
 }
 
 stk::StkFloat Blanket::tick(void) {

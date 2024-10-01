@@ -7,6 +7,7 @@
 #include <Generator.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 class Blanket: public stk::Generator {
 public:
