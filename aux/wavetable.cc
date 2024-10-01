@@ -19,6 +19,7 @@ WavData::WavData(FileLoop wave, ADSR env, Matrix *mat, double *freqs) {
         // create a copy of the wave, give it its own frequecny, and reset it for good measure
         this->waves.push_back(wave);
         this->waves[i].setFrequency(freqs[i]);
+        // TODO once Blanket is implemented make it only reset if envelope was IDLE
         //this->waves[i].reset();
 
         // create corresponding copy of the envelope
@@ -36,7 +37,7 @@ int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudio
         if(dat->mat->buf[i] == 1 && dat->held.count(i) == 0) {
             dat->held.insert(i);
             dat->envs[i].keyOn();
-            dat->waves[i].reset();
+            //dat->waves[i].reset();
         }
         // key was just released
         else if(dat->mat->buf[i] == 0 && dat->held.count(i) > 0) {
@@ -52,6 +53,7 @@ int wav_tick(void *output, void *input, uint nframes, double streamTime, RtAudio
 
     //compute frames for each note and add to total
     for(int i = 0; i < dat->n; i++) {
+        // TODO skip note if envelope is currently IDLE
         StkFrames wav(nframes, 1);
         StkFrames env(nframes, 1);
         dat->waves[i].tick(wav);
