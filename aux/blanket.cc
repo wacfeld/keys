@@ -6,9 +6,9 @@ Blanket::Blanket(void) {
     index = 0;
 
     // instant attack with a target/sustain of 1
-    opening.emplace_back(-1, 1);
+    opening.emplace_back(0, 1);
     // instant release
-    closing.emplace_back(-1, 0);
+    closing.emplace_back(0, 0);
 
     Stk::addSampleRateAlert(this);
 }
@@ -26,7 +26,13 @@ Blanket::~Blanket(void) {
     Stk::removeSampleRateAlert(this);
 }
 
-Blanket::setShape(std::string shape) {
+void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
+    if(!ignoreSampleRateChange_) {
+
+    }
+}
+
+void Blanket::setShape(std::string shape) {
 
 }
 
@@ -37,8 +43,4 @@ stk::StkFloat Blanket::tick(void) {
 stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
 
     return frames;
-}
-
-void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
-    
 }

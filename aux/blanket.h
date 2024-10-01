@@ -29,12 +29,14 @@ public:
 protected:
     void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
 
-    // vectors of (rate, target) pairs for the when the note is held (opening) and released (closing)
-    // a rate of -1 stands for infinity (instantaneous change)
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> opening;
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> closing;
+    // vectors of (time, target) pairs for the when the note is held (opening) and released (closing)
+    // behind the scenes the time gets converted to a rate so that prematurely released notes take less time to diminish
+    std::vector<std::pair<double, stk::StkFloat>> opening;
+    std::vector<std::pair<double, stk::StkFloat>> closing;
 
     // when the state is OPENING or CLOSING, the index tells us what part of the opening/closing vectors to look at
     int index;
+
+    stk::StkFloat sampleRate;
 };
 #endif
