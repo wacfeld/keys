@@ -1,12 +1,20 @@
 import struct
 import numpy as np
+import os
+
 from viz import plot
 
 ## write data
 
 # write binary data to file
 # data is a list of numbers
-def write(fname, data):
+def write(data, fname, overwrite=False):
+    if os.path.isfile(fname):
+        if overwrite:
+            print(f'overwriting {fname}')
+        else:
+            print(f'file {fname} already exists')
+            return
     if not fname.endswith('.raw'):
         print(f'filename {fname} does not end in ".raw"')
         exit(1)
@@ -45,4 +53,5 @@ def marimba():
     tri = triangle()
     # triangle wave tuned up 2 octaves
     tri4 = double(double(triangle()))
-    return (tri + tri4) / 2
+    mar = (tri + tri4*3/4) / 1.75
+    return mar.astype(int)
