@@ -6,6 +6,7 @@ import sys
 import struct
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy import inf
 from numpy.fft import fft
 
 from myio import read
@@ -45,12 +46,16 @@ def freqs(data, title=None, threshold=0.001):
             pos = pos[:i]
 
     pos = 10*np.log10(pos)
+    pos[pos==-inf] = -200
 
     plt.plot(pos)
     if title is not None:
         plt.title(title)
     plt.xlabel('Hz')
-    plt.ylabel('dB')
+    plt.ylabel('amplitude')
+    plt.ylim(bottom=-100)
+    plt.xlim(right=50)
+    plt.xlim(left=0)
     plt.show()
 
 if __name__ == '__main__':
