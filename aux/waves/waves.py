@@ -49,9 +49,23 @@ def sawtooth():
 
 ## sophisticated waves
 
-def marimba():
+def marimba2():
     tri = triangle()
     # triangle wave tuned up 2 octaves
     tri4 = double(double(triangle()))
     mar = (tri + tri4*3/4) / 1.75
+    return mar.astype(int)
+
+def marimba():
+    tri = triangle()
+    # triangle wave tuned up 2 octaves
+    tri4 = double(double(triangle()))
+    mar = (tri + tri4) // 2
+    return mar
+
+def marimba3():
+    tri = triangle()
+    # triangle wave tuned up 2 octaves
+    tri4 = double(double(triangle()))
+    mar = (tri + tri4/2) / 1.5
     return mar.astype(int)
