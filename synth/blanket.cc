@@ -145,7 +145,7 @@ int Blanket::setShape(std::string shape) {
 // getIndex() implements the above logic
 size_t getIndex(stk::StkFloat level, pairvec pairs) {
     if(pairs.size() == 0) {
-        std::cerr << "unreachable state in getIndex(): pairs is empty\n";
+        std::cerr << "unreachable state in Blanket::getIndex(): pairs is empty\n";
         return 0;
     }
 
@@ -182,7 +182,9 @@ void Blanket::keyOn() {
     // update index
     switch(phase) {
     case OPENING:
-    case SUSTAIN: // should not be possible under normal operation but we account for it anyway
+    case SUSTAIN: // should not be possible under normal operation but we account for it anyway after printing a warning
+        std::cerr << "Warning: Blanket::keyOn() called while in SUSTAIN phase\n";
+        // FALLTHROUGH
     case CLOSING:
         index = getIndex(level, opening);
         break;
@@ -198,7 +200,19 @@ void Blanket::keyOn() {
 
 void Blanket::keyOff() {
     held = false;
-    phase = RELEASE;
+    switch(phase) {
+    case SUSTAIN: // normal release
+        phase = RELEASE;
+        index = 0;
+        break;
+    case CLOSING: // should not be possible
+        std::cerr << "Warning: Blanket::keyOff() called while in CLOSING phase\n";
+        break;
+    case IDLE: // also should not be possible
+        std::cerr << "Warning: Blanket::keyOff() called while in IDLE phase\n";
+        break;
+    case OPENING: // early release, do nothing
+    }
 }
 
 stk::StkFloat Blanket::tick(void) {

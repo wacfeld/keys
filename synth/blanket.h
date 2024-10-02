@@ -45,7 +45,7 @@ protected:
     enum phase phase;
     // if the phase is opening or closing, what's our current target? (see the above vectors)
     int index;
-    // is the key currently held?
+    // is the key currently held? (used to determine whether to sustain)
     bool held;
     // what level is the envelope at? (somewhere in [0,1])
     stk::StkFloat level;
