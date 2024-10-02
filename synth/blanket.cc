@@ -60,7 +60,7 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
 // - instantaneously go to 0
 void Blanket::setShape(std::string shape) {
     // get strings on either side of the semicolon
-    unsigned long i = shape.find(";");
+    size_t i = shape.find(";");
     if(i == shape.npos) {
         std::cerr << "Blanket::setShape() could not find semicolon in the following string: " << shape << std::endl;
     }
@@ -68,6 +68,16 @@ void Blanket::setShape(std::string shape) {
     auto close = shape.substr(i);
 
 
+}
+
+std::vector<std::pair<stk::StkFloat, stk::StkFloat>> parsePairs(std::string s) {
+    std::vector<std::string> pairs;
+    size_t pos = 0;
+    while((pos = s.find(",")) != s.npos) {
+        pair = s.substr(0, pos);
+        pairs.push_back(pair);
+        s.erase(0, pos+1);
+    }
 }
 
 stk::StkFloat Blanket::tick(void) {
