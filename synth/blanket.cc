@@ -144,21 +144,38 @@ int Blanket::setShape(std::string shape) {
 //
 // getIndex() implements the above logic
 size_t getIndex(stk::StkFloat level, pairvec pairs) {
-    if(pairs.size() == 1) {
+    if(pairs.size() == 0) {
+        std::cerr << "unreachable state in getIndex(): pairs is empty\n";
         return 0;
     }
 
+    // extract the targets into a vector for easier logic below
+    std::vector<stk::StkFloat> targets;
+    // append an implicit zero (getIndex() is only used for opening, not closing)
+    targets.push_back(0);
+    for(auto pair : pairs) {
+        targets.push_back(pair.second);
+    }
+
     // find first intersection point
-    for(size_t i = 0; i < pairs.size()-1; i++) {
-        stk::StkFloat before=pairs[i].second, after=pairs[i+1].second;
+    for(size_t i = 0; i < targets.size()-1; i++) {
+        stk::StkFloat before=targets[i], after=targets[i+1];
         if(before <= level && level < after) {
             return i;
         }
     }
 
     // if no intersection points, find max (break ties with leftmost)
+    // remove implicit zero from before
+    targets.erase(targets.begin());
     size_t maxind = 0;
-    stk::StkFloat max = pairs[0].second;
+    for(size_t i = 1; i < pairs.size(); i++) {
+        if(targets[i] > targets[maxind]) {
+            maxind = i;
+        }
+    }
+    
+    return maxind;
 }
 
 void Blanket::keyOn() {
