@@ -4,6 +4,7 @@ typedef std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairvec;
 
 // default constructor sets the most simple envelope possible
 Blanket::Blanket(void) {
+    held = false;
     state = IDLE;
     index = 0;
 
@@ -16,6 +17,7 @@ Blanket::Blanket(void) {
 }
 
 Blanket::Blanket(std::string shape) {
+    held = false;
     state = IDLE;
     index = 0;
 
@@ -136,8 +138,12 @@ int Blanket::setShape(std::string shape) {
 
 // see keyOn()
 size_t getIndex(stk::StkFloat level, pairvec pairs) {
-    for(size_t i = 0; i < pairs.size(); i++) {
-        
+    // find first intersection point
+    for(size_t i = 0; i < pairs.size()-1; i++) {
+        stk::StkFloat before=pairs[i].second, after=pairs[i+1].second;
+        if(before <= level && level < after) {
+            return i;
+        }
     }
 }
 
@@ -150,12 +156,15 @@ size_t getIndex(stk::StkFloat level, pairvec pairs) {
 //
 // the logic is identical for keyOff().
 void Blanket::keyOn() {
-    // change the state
-    state = OPENING;
+    // update the state
+    held = true;
+    if(phase == IDLE) {
+        phase = OPENING;
+    }
 }
 
 void Blanket::keyOff() {
-    state = CLOSING;
+    held = false;
 }
 
 stk::StkFloat Blanket::tick(void) {

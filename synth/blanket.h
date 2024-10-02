@@ -11,8 +11,7 @@
 
 class Blanket: public stk::Generator {
 public:
-    enum State {OPENING, CLOSING, SUSTAIN, IDLE};
-    enum State state;
+    enum phase {OPENING, CLOSING, SUSTAIN, IDLE};
 
     Blanket(void);
     Blanket(std::string shape);
@@ -20,6 +19,7 @@ public:
 
     void keyOn(void);
     void keyOff(void);
+    enum phase getPhase(void);
     
     int setShape(std::string shape);
 
@@ -30,14 +30,17 @@ public:
 protected:
     void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
 
+    stk::StkFloat sampleRate;
+
     // vectors of (time, target) pairs for the when the note is held (opening) and released (closing)
-    // behind the scenes the time gets converted to a rate so that prematurely released notes take less time to diminish
     std::vector<std::pair<stk::StkFloat, stk::StkFloat>> opening;
     std::vector<std::pair<stk::StkFloat, stk::StkFloat>> closing;
 
-    // when the state is OPENING or CLOSING, the index tells us what part of the opening/closing vectors to look at
-    int index;
+    // state variables
 
-    stk::StkFloat sampleRate;
+    // if the key is released while still in the opening phase, the opening phase will complete before switching to release
+    enum Phase phase;
+    bool held;
+    int index;
 };
 #endif
