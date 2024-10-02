@@ -124,7 +124,27 @@ int Blanket::setShape(std::string shape) {
     opening = open;
     closing = close;
 
+    // if closing is empty or ends with nonzero target, infer an instantaneous drop to 0
+    if(closing.size() == 0 || closing.back().second != 0) {
+        closing.emplace_back(0, 0);
+    }
+
     return 1;
+}
+
+// because we allow so much freedom in defining the shape of the envelope, keyOn() and keyOff() are nontrivial
+//
+// let f(x) be the function of the shape of the opening portion of the envelope. let C be the current value of the envelope. keyOn() does the following:
+//
+// - if the line y=C intersects with f(x), start on the leftmost intersection point
+// - if they do not intersect, start at the peak of the graph f(x)
+//
+// the logic is identical for keyOff().
+void Blanket::keyOn() {
+    // change the state
+    state = OPENING;
+
+    // figure out our index
 }
 
 stk::StkFloat Blanket::tick(void) {
