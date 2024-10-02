@@ -21,7 +21,7 @@ public:
     void keyOn(void);
     void keyOff(void);
     
-    void setShape(std::string shape);
+    int setShape(std::string shape);
 
     stk::StkFloat lastOut(void) const {return lastFrame_[0];}
 

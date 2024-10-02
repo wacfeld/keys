@@ -17,7 +17,12 @@ Blanket::Blanket(std::string shape) {
     state = IDLE;
     index = 0;
 
-    setShape(shape);
+    int success = setShape(shape);
+    // if shape string was invalid, default to simple envelope
+    if(!success) {
+        opening.emplace_back(0, 1);
+        closing.emplace_back(0, 0);
+    }
 
     Stk::addSampleRateAlert(this);
 }
@@ -58,26 +63,43 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
 // - instantaneously go to 1
 // - sustain at 1
 // - instantaneously go to 0
-void Blanket::setShape(std::string shape) {
+//
+// setShape() returns 1 on success and 0 on failure
+int Blanket::setShape(std::string shape) {
     // get strings on either side of the semicolon
     size_t i = shape.find(";");
     if(i == shape.npos) {
-        std::cerr << "Blanket::setShape() could not find semicolon in the following string: " << shape << std::endl;
+        std::cerr << "Blanket could not find semicolon in shape string \"" << shape << "\"\n";
+        return 0;
     }
     auto open = shape.substr(0, i);
     auto close = shape.substr(i);
 
+    opening = parsePairs(open);
+    closing = parsePairs(close);
 
+    return 1;
 }
 
-std::vector<std::pair<stk::StkFloat, stk::StkFloat>> parsePairs(std::string s) {
-    std::vector<std::string> pairs;
+std::vector<std::pair<stk::StkFloat, stk::StkFloat>> Blanket::parsePairs(std::string s) {
+    // split by commas
+    std::vector<std::string> tokens;
     size_t pos = 0;
     while((pos = s.find(",")) != s.npos) {
-        pair = s.substr(0, pos);
-        pairs.push_back(pair);
+        auto token = s.substr(0, pos);
+        tokens.push_back(token);
         s.erase(0, pos+1);
     }
+
+    // split by colons
+    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs;
+    double time, target;
+    for(size_t i = 0; i < tokens.size(); i++) {
+        sscanf(tokens[i].c_str(), "%lf:%lf", &time, &target);
+        pairs.emplace_back(time, target);
+    }
+
+    return pairs;
 }
 
 stk::StkFloat Blanket::tick(void) {
