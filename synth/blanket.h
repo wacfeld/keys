@@ -30,8 +30,6 @@ public:
 protected:
     void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
 
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> parsePairs(std::string s);
-
     // vectors of (time, target) pairs for the when the note is held (opening) and released (closing)
     // behind the scenes the time gets converted to a rate so that prematurely released notes take less time to diminish
     std::vector<std::pair<stk::StkFloat, stk::StkFloat>> opening;

@@ -37,6 +37,42 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
     }
 }
 
+static bool isValid(std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs) {
+    for(auto pair : pairs) {
+        if(pair.first < 0) {
+            std::cerr << "Blanket: time must be non-negative, received " << pair.first << std::endl;
+            return false
+        }
+        if(pair.second < 0 || pair.second > 1) {
+            std::cerr << "Blanket: target must be be between 0 and 1, received " << pair.second << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+static std::vector<std::pair<stk::StkFloat, stk::StkFloat>> parsePairs(std::string s) {
+    // split by commas
+    std::vector<std::string> tokens;
+    size_t pos = 0;
+    while((pos = s.find(",")) != s.npos) {
+        auto token = s.substr(0, pos);
+        tokens.push_back(token);
+        s.erase(0, pos+1);
+    }
+
+    // split by colons
+    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs;
+    double time, target;
+    for(size_t i = 0; i < tokens.size(); i++) {
+        sscanf(tokens[i].c_str(), "%lf:%lf", &time, &target);
+        pairs.emplace_back(time, target);
+    }
+
+    return pairs;
+}
+
+
 // `shape` has form "opening;closing",
 // where opening and closing are comma separated lists of pairs,
 // where a pair has form "time:target",
@@ -69,37 +105,14 @@ int Blanket::setShape(std::string shape) {
     // get strings on either side of the semicolon
     size_t i = shape.find(";");
     if(i == shape.npos) {
-        std::cerr << "Blanket could not find semicolon in shape string \"" << shape << "\"\n";
+        std::cerr << "Blanket: could not find semicolon in shape string \"" << shape << "\"\n";
         return 0;
     }
-    auto open = shape.substr(0, i);
-    auto close = shape.substr(i);
 
-    opening = parsePairs(open);
-    closing = parsePairs(close);
+    auto open = parsePairs(shape.substr(0, i));
+    auto close = parsePairs(shape.substr(i));
 
     return 1;
-}
-
-std::vector<std::pair<stk::StkFloat, stk::StkFloat>> Blanket::parsePairs(std::string s) {
-    // split by commas
-    std::vector<std::string> tokens;
-    size_t pos = 0;
-    while((pos = s.find(",")) != s.npos) {
-        auto token = s.substr(0, pos);
-        tokens.push_back(token);
-        s.erase(0, pos+1);
-    }
-
-    // split by colons
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs;
-    double time, target;
-    for(size_t i = 0; i < tokens.size(); i++) {
-        sscanf(tokens[i].c_str(), "%lf:%lf", &time, &target);
-        pairs.emplace_back(time, target);
-    }
-
-    return pairs;
 }
 
 stk::StkFloat Blanket::tick(void) {
