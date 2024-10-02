@@ -1,5 +1,7 @@
 #include "blanket.h"
 
+typedef std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairvec;
+
 // default constructor sets the most simple envelope possible
 Blanket::Blanket(void) {
     state = IDLE;
@@ -37,7 +39,7 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
     }
 }
 
-static bool pairsValid(std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs) {
+static bool pairsValid(pairvec pairs) {
     for(auto pair : pairs) {
         if(pair.first < 0) {
             std::cerr << "Blanket: time must be non-negative, received " << pair.first << std::endl;
@@ -51,7 +53,7 @@ static bool pairsValid(std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pair
     return true;
 }
 
-static std::vector<std::pair<stk::StkFloat, stk::StkFloat>> parsePairs(std::string s) {
+static pairvec parsePairs(std::string s) {
     // split by commas
     std::vector<std::string> tokens;
     size_t pos = 0;
@@ -62,7 +64,7 @@ static std::vector<std::pair<stk::StkFloat, stk::StkFloat>> parsePairs(std::stri
     }
 
     // split by colons
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs;
+    pairvec pairs;
     double time, target;
     for(size_t i = 0; i < tokens.size(); i++) {
         sscanf(tokens[i].c_str(), "%lf:%lf", &time, &target);
@@ -130,6 +132,13 @@ int Blanket::setShape(std::string shape) {
     }
 
     return 1;
+}
+
+// see keyOn()
+size_t getIndex(stk::StkFloat level, pairvec pairs) {
+    for(size_t i = 0; i < pairs.size(); i++) {
+        
+    }
 }
 
 // because we allow so much freedom in defining the shape of the envelope, keyOn() and keyOff() are nontrivial
