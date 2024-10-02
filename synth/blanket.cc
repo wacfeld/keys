@@ -44,11 +44,11 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
 static bool pairsValid(pairvec pairs) {
     for(auto pair : pairs) {
         if(pair.first < 0) {
-            std::cerr << "Blanket: time must be non-negative, received " << pair.first << std::endl;
+            std::cerr << "Warning: time must be non-negative, Blanket instance received " << pair.first << std::endl;
             return false;
         }
         if(pair.second < 0 || pair.second > 1) {
-            std::cerr << "Blanket: target must be be between 0 and 1, received " << pair.second << std::endl;
+            std::cerr << "Warning: target must be be between 0 and 1, Blanket instance received " << pair.second << std::endl;
             return false;
         }
     }
@@ -202,7 +202,7 @@ void Blanket::keyOff() {
     held = false;
     switch(phase) {
     case SUSTAIN: // normal release
-        phase = RELEASE;
+        phase = CLOSING;
         index = 0;
         break;
     case CLOSING: // should not be possible
@@ -212,6 +212,7 @@ void Blanket::keyOff() {
         std::cerr << "Warning: Blanket::keyOff() called while in IDLE phase\n";
         break;
     case OPENING: // early release, do nothing
+        ;
     }
 }
 
