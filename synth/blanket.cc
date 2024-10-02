@@ -37,7 +37,7 @@ void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
     }
 }
 
-static bool isValid(std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs) {
+static bool pairsValid(std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs) {
     for(auto pair : pairs) {
         if(pair.first < 0) {
             std::cerr << "Blanket: time must be non-negative, received " << pair.first << std::endl;
@@ -112,7 +112,7 @@ int Blanket::setShape(std::string shape) {
     auto open = parsePairs(shape.substr(0, i));
     auto close = parsePairs(shape.substr(i));
 
-    if(!isValid(open) || !isValid(close)) {
+    if(!pairsValid(open) || !pairsValid(close)) {
         return 0;
     }
 
@@ -143,8 +143,10 @@ int Blanket::setShape(std::string shape) {
 void Blanket::keyOn() {
     // change the state
     state = OPENING;
+}
 
-    // figure out our index
+void Blanket::keyOff() {
+    state = CLOSING;
 }
 
 stk::StkFloat Blanket::tick(void) {
