@@ -41,7 +41,7 @@ static bool isValid(std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairs) 
     for(auto pair : pairs) {
         if(pair.first < 0) {
             std::cerr << "Blanket: time must be non-negative, received " << pair.first << std::endl;
-            return false
+            return false;
         }
         if(pair.second < 0 || pair.second > 1) {
             std::cerr << "Blanket: target must be be between 0 and 1, received " << pair.second << std::endl;
@@ -111,6 +111,18 @@ int Blanket::setShape(std::string shape) {
 
     auto open = parsePairs(shape.substr(0, i));
     auto close = parsePairs(shape.substr(i));
+
+    if(!isValid(open) || !isValid(close)) {
+        return 0;
+    }
+
+    if(open.size() == 0) {
+        std::cerr << "Blanket: opening shape cannot be empty\n";
+        return 0;
+    }
+
+    opening = open;
+    closing = close;
 
     return 1;
 }
