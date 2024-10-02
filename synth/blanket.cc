@@ -179,15 +179,26 @@ size_t getIndex(stk::StkFloat level, pairvec pairs) {
 }
 
 void Blanket::keyOn() {
-    // update the state
-    held = true;
-    if(phase == IDLE) {
-        phase = OPENING;
+    // update index
+    switch(phase) {
+    case OPENING:
+    case SUSTAIN: // should not be possible under normal operation but we account for it anyway
+    case CLOSING:
+        index = getIndex(level, opening);
+        break;
+    case IDLE:
+        index = 0;
+        break;
     }
+    
+    // update other state variables (do not touch level)
+    held = true;
+    phase = OPENING;
 }
 
 void Blanket::keyOff() {
     held = false;
+    phase = RELEASE;
 }
 
 stk::StkFloat Blanket::tick(void) {

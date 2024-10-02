@@ -38,9 +38,16 @@ protected:
 
     // state variables
 
-    // if the key is released while still in the opening phase, the opening phase will complete before switching to release
+    // if the key is pressed again before the envelope becomes zero, we re-enter the opening phase somewhere in the middle (see getIndex())
+    // if the key is released while still in the opening phase, the opening phase will complete before switching immediately to release
+
+    // what phase of the envelope are we in?
     enum phase phase;
-    bool held;
+    // if the phase is opening or closing, what's our current target? (see the above vectors)
     int index;
+    // is the key currently held?
+    bool held;
+    // what level is the envelope at? (somewhere in [0,1])
+    stk::StkFloat level;
 };
 #endif
