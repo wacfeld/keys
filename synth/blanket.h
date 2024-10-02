@@ -39,7 +39,7 @@ protected:
     // state variables
 
     // if the key is released while still in the opening phase, the opening phase will complete before switching to release
-    enum Phase phase;
+    enum phase phase;
     bool held;
     int index;
 };

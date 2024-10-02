@@ -5,7 +5,7 @@ typedef std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairvec;
 // default constructor sets the most simple envelope possible
 Blanket::Blanket(void) {
     held = false;
-    state = IDLE;
+    phase = IDLE;
     index = 0;
 
     // instant attack with a target/sustain of 1
@@ -18,7 +18,7 @@ Blanket::Blanket(void) {
 
 Blanket::Blanket(std::string shape) {
     held = false;
-    state = IDLE;
+    phase = IDLE;
     index = 0;
 
     int success = setShape(shape);
@@ -136,8 +136,18 @@ int Blanket::setShape(std::string shape) {
     return 1;
 }
 
-// see keyOn()
+// because we allow so much freedom in defining the shape of the envelope, entering it from a non-zero level can be nontrivial.
+// let f(x) be the function of the shape of the opening portion of the envelope. let C be the current value of the envelope. keyOn() does the following:
+//
+// - if the line y=C intersects with f(x), start on the leftmost intersection point
+// - if they do not intersect, start at the peak of the graph f(x)
+//
+// getIndex() implements the above logic
 size_t getIndex(stk::StkFloat level, pairvec pairs) {
+    if(pairs.size() == 1) {
+        return 0;
+    }
+
     // find first intersection point
     for(size_t i = 0; i < pairs.size()-1; i++) {
         stk::StkFloat before=pairs[i].second, after=pairs[i+1].second;
@@ -145,16 +155,12 @@ size_t getIndex(stk::StkFloat level, pairvec pairs) {
             return i;
         }
     }
+
+    // if no intersection points, find max (break ties with leftmost)
+    size_t maxind = 0;
+    stk::StkFloat max = pairs[0].second;
 }
 
-// because we allow so much freedom in defining the shape of the envelope, keyOn() and keyOff() are nontrivial
-//
-// let f(x) be the function of the shape of the opening portion of the envelope. let C be the current value of the envelope. keyOn() does the following:
-//
-// - if the line y=C intersects with f(x), start on the leftmost intersection point
-// - if they do not intersect, start at the peak of the graph f(x)
-//
-// the logic is identical for keyOff().
 void Blanket::keyOn() {
     // update the state
     held = true;
