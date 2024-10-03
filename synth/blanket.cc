@@ -224,9 +224,27 @@ void Blanket::keyOff() {
     }
 }
 
+pairvec *Blanket::curPairs() {
+    if(phase != OPENING && phase != CLOSING) {
+        std::cerr << "Blanket::curPairs() called outside of opening or closing\n";
+        return nullptr;
+    }
+}
+
 // we reached our target, now increment the index or switch to the next phase
 void Blanket::reachedTarget() {
-
+    if(phase != OPENING && phase != CLOSING) {
+        std::cerr << "Blanket::reachedTarget() called outside of opening or closing\n";
+    }
+    index++;
+    if(index >= pairs.size()) {
+        if(phase == OPENING) {
+            phase = SUSTAIN;
+        }
+        else if(phase == CLOSING) {
+            phase = IDLE;
+        }
+    }
 }
 
 inline stk::StkFloat Blanket::tick(void) {
@@ -236,8 +254,9 @@ inline stk::StkFloat Blanket::tick(void) {
     switch(phase) {
     case IDLE: return 0;
     case SUSTAIN: return opening.back().second;
-    case OPENING: pairs = &opening; break;
-    case CLOSING: pairs = &closing; break;
+    case OPENING:
+    case CLOSING:
+        pairs = curPairs();
     }
 
     // where did we come from, where are we going, and how much time total do we have to do that?

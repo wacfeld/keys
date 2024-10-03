@@ -32,7 +32,7 @@ public:
 
 protected:
     void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
-
+    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> *curPairs();
     void reachedTarget(void);
 
     stk::StkFloat sampleRate;
