@@ -236,8 +236,11 @@ void Blanket::reachedTarget() {
     if(phase != OPENING && phase != CLOSING) {
         std::cerr << "Blanket::reachedTarget() called outside of opening or closing\n";
     }
+
     index++;
-    if(index >= pairs.size()) {
+    pairvec *pairs = curPairs();
+
+    if(index >= pairs->size()) {
         if(phase == OPENING) {
             phase = SUSTAIN;
         }
@@ -260,17 +263,26 @@ inline stk::StkFloat Blanket::tick(void) {
     }
 
     // where did we come from, where are we going, and how much time total do we have to do that?
-    // from these three variables (as well as our current level) we calculate the rate that we need to travel this next step
-    stk::StkFloat origin, target, time, diff;
+    stk::StkFloat origin, target, time;
     origin = (index == 0) ? 0 : (*pairs)[index-1].second;
     target = (*pairs)[index].second;
     time = (*pairs)[index].first;
-    diff = target - origin;
 
-    // but first, check if we've already reached (or exceeded) our target
+    // special case: if time is 0, jump immediately
+    if(time == 0) {
+        reachedTarget();
+        return target;
+    }
 
-    if(diff < 0 && 
-    stk::StkFloat rate = 
+    // from the above variables (as well as our current level) we calculate the rate that we need to travel this next step
+    stk::StkFloat rate = ;
+
+
+    // check if we've already reached (or exceeded) our target
+
+    //if((diff < 0 && level <= target) || (diff > 0 && level >= target)) {
+        //reachedTarget();
+    //}
 }
 
 stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
