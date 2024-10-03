@@ -19,11 +19,11 @@ public:
 
     void keyOn(void);
     void keyOff(void);
-    enum phase getPhase(void);
     
     int setShape(std::string shape);
 
-    stk::StkFloat lastOut(void) const;
+    enum phase getPhase(void) const;
+    stk::StkFloat getLevel(void) const;
 
     stk::StkFloat tick(void);
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);

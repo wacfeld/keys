@@ -35,8 +35,12 @@ Blanket::~Blanket(void) {
     Stk::removeSampleRateAlert(this);
 }
 
-enum Blanket::phase Blanket::getPhase() {
+enum Blanket::phase Blanket::getPhase() const {
     return phase;
+}
+
+stk::StkFloat Blanket::getLevel() const {
+    return level;
 }
 
 void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
@@ -227,8 +231,4 @@ stk::StkFloat Blanket::tick(void) {
 stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
 
     return frames;
-}
-
-stk::StkFloat Blanket::lastOut() const {
-    return level;
 }
