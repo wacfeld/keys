@@ -23,7 +23,7 @@ public:
     
     int setShape(std::string shape);
 
-    stk::StkFloat lastOut(void) const {return lastFrame_[0];}
+    stk::StkFloat lastOut(void) const;
 
     stk::StkFloat tick(void);
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);

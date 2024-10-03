@@ -228,3 +228,7 @@ stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
 
     return frames;
 }
+
+stk::StkFloat Blanket::lastOut() const {
+    return level;
+}
