@@ -27,6 +27,7 @@ public:
 
     stk::StkFloat tick(void);
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);
+
 protected:
     void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
 

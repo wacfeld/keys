@@ -224,11 +224,28 @@ void Blanket::keyOff() {
     }
 }
 
-stk::StkFloat Blanket::tick(void) {
-    return 0;
+inline stk::StkFloat Blanket::tick(void) {
+    // if IDLE or SUSTAIN, return appropriate value
+    // otherwise set pairs to be either opening or closing
+    pairvec *pairs;
+    switch(phase) {
+    case IDLE: return 0;
+    case SUSTAIN: return opening.back().second;
+    case OPENING: pairs = &opening; break;
+    case CLOSING: pairs = &closing; break;
+    }
+
+    stk::StkFloat origin, target;
+    origin = (index == 0) ? 0 : (*pairs)[index-1].second;
+    target = (*pairs)[index].second;
 }
 
 stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
-
+    stk::StkFloat *samples = &frames[channel];
+    unsigned int hop = frames.channels();
+    for(unsigned int i = 0; i < frames.frames(); i++) {
+        *samples = Blanket::tick();
+        samples += hop;
+    }
     return frames;
 }
