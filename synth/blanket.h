@@ -9,6 +9,8 @@
 #include <vector>
 #include <iostream>
 
+// TODO have different options for early release jumps to closing, second press resets to start of opening, etc.
+
 class Blanket: public stk::Generator {
 public:
     enum phase {OPENING, CLOSING, SUSTAIN, IDLE};
@@ -30,6 +32,8 @@ public:
 
 protected:
     void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
+
+    void reachedTarget(void);
 
     stk::StkFloat sampleRate;
 

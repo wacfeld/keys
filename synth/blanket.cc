@@ -148,7 +148,7 @@ int Blanket::setShape(std::string shape) {
 // let f(x) be the function of the shape of the opening portion of the envelope. let C be the current value of the envelope. keyOn() does the following:
 //
 // - if the line y=C intersects with f(x), start on the leftmost intersection point
-// - if they do not intersect, start at the peak of the graph f(x)
+// - if they do not intersect, start at the rightmost peak of the graph f(x)
 //
 // getIndex() implements the above logic
 size_t getIndex(stk::StkFloat level, pairvec pairs) {
@@ -178,7 +178,7 @@ size_t getIndex(stk::StkFloat level, pairvec pairs) {
     targets.erase(targets.begin());
     size_t maxind = 0;
     for(size_t i = 1; i < pairs.size(); i++) {
-        if(targets[i] > targets[maxind]) {
+        if(targets[i] >= targets[maxind]) { // >= to get rightmost
             maxind = i;
         }
     }
@@ -224,6 +224,11 @@ void Blanket::keyOff() {
     }
 }
 
+// we reached our target, now increment the index or switch to the next phase
+void Blanket::reachedTarget() {
+
+}
+
 inline stk::StkFloat Blanket::tick(void) {
     // if IDLE or SUSTAIN, return appropriate value
     // otherwise set pairs to be either opening or closing
@@ -235,9 +240,18 @@ inline stk::StkFloat Blanket::tick(void) {
     case CLOSING: pairs = &closing; break;
     }
 
-    stk::StkFloat origin, target;
+    // where did we come from, where are we going, and how much time total do we have to do that?
+    // from these three variables (as well as our current level) we calculate the rate that we need to travel this next step
+    stk::StkFloat origin, target, time, diff;
     origin = (index == 0) ? 0 : (*pairs)[index-1].second;
     target = (*pairs)[index].second;
+    time = (*pairs)[index].first;
+    diff = target - origin;
+
+    // but first, check if we've already reached (or exceeded) our target
+
+    if(diff < 0 && 
+    stk::StkFloat rate = 
 }
 
 stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
