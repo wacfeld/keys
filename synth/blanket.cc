@@ -35,6 +35,10 @@ Blanket::~Blanket(void) {
     Stk::removeSampleRateAlert(this);
 }
 
+enum Blanket::phase Blanket::getPhase() {
+    return phase;
+}
+
 void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
     if(!ignoreSampleRateChange_) {
         sampleRate = newRate;
