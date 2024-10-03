@@ -242,7 +242,11 @@ void Blanket::reachedTarget() {
 
     if(index >= pairs->size()) {
         if(phase == OPENING) {
-            phase = SUSTAIN;
+            if(held) {
+                phase = SUSTAIN;
+            } else {
+                phase = CLOSING;
+            }
         }
         else if(phase == CLOSING) {
             phase = IDLE;
