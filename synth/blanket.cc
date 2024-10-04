@@ -278,15 +278,16 @@ inline stk::StkFloat Blanket::tick(void) {
         return target;
     }
 
-    // from the above variables (as well as our current level) we calculate the rate that we need to travel this next step
-    stk::StkFloat rate = ;
+    // from the above variables, we calculate the rate that we need to travel this next step
+    stk::StkFloat rate = (target-origin)/time;
+    level += rate;
 
-
-    // check if we've already reached (or exceeded) our target
-
-    //if((diff < 0 && level <= target) || (diff > 0 && level >= target)) {
-        //reachedTarget();
-    //}
+    // check if we've reached (or exceeded) our target
+    stk::StkFloat diff = target - origin;
+    if((diff < 0 && level <= target) || (diff > 0 && level >= target)) {
+        level = target;
+        reachedTarget();
+    }
 }
 
 stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
