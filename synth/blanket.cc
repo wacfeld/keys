@@ -180,15 +180,15 @@ long getTime(stk::StkFloat level, pairvec *pairs) {
 void Blanket::keyOn() {
     // update index
     switch(phase) {
+    // early repress
     case OPENING:
-    case SUSTAIN: // should not be possible under normal operation but we account for it anyway after printing a warning
-        std::cerr << "Warning: Blanket::keyOn() called while in SUSTAIN phase\n";
-        // FALLTHROUGH
+    case SUSTAIN:
     case CLOSING:
-        index = getIndex(level, opening);
+        time = getTime(level, &opening);
         break;
+    // regular repress
     case IDLE:
-        index = 0;
+        time = 0;
         break;
     }
     
