@@ -1,30 +1,18 @@
 #include "blanket.h"
 
-typedef std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairvec;
+typedef std::vector<std::pair<long, stk::StkFloat>> pairvec;
 
 // default constructor sets the most simple envelope possible
 Blanket::Blanket(stk::stkFloat sampleRate) {
-    // initialize state variables
+    // initialize variables
     phase = IDLE;
     time = 0;
     held = false;
     level = 0;
+    this->sampleRate = sampleRate;
 
-    // set instant attack and release
-    setShape("0:1;0:0", sampleRate);
-}
-
-Blanket::Blanket(std::string shape, stk::StkFloat sampleRate) {
-    phase = IDLE;
-    time = 0;
-    held = false;
-    level = 0;
-
-    int success = setShape(shape, sampleRate);
-    // if shape string was invalid, default to simple envelope
-    if(!success) {
-        setShape("0:1;0:0", sampleRate);
-    }
+    // set instant attack and release as default
+    setShape("0:1;0:0");
 }
 
 enum Blanket::phase Blanket::getPhase() const {
@@ -49,6 +37,13 @@ static bool pairsValid(pairvec pairs) {
     return true;
 }
 
+// input is seconds, output is samples
+long calcSamples(stk::StkFloat s) {
+    // minimum allowed delay is 0, so for example calcDelay(0) == 1
+    long d = s * sampleRate;
+    return (d == 0) ? 1 : d;
+}
+
 static pairvec parsePairs(std::string s) {
     // split by commas
     std::vector<std::string> tokens;
@@ -59,12 +54,17 @@ static pairvec parsePairs(std::string s) {
         s.erase(0, pos+1);
     }
 
-    // split by colons
+    // keep track of the time in samples
     pairvec pairs;
-    double time, target;
+    long samp = 0;
+
+    // split by colons
     for(size_t i = 0; i < tokens.size(); i++) {
+        stk::StkFloat time, target;
         sscanf(tokens[i].c_str(), "%lf:%lf", &time, &target);
-        pairs.emplace_back(time, target);
+
+        samp += calcSamples(time);
+        pairs.emplace_back(samp, target);
     }
 
     return pairs;

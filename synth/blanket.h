@@ -16,12 +16,11 @@ public:
     enum phase {OPENING, CLOSING, SUSTAIN, IDLE};
 
     Blanket(stk::stkFloat sampleRate);
-    Blanket(std::string shape, stk::StkFloat sampleRate);
 
     void keyOn(void);
     void keyOff(void);
     
-    int setShape(std::string shape, stk::StkFloat sampleRate);
+    int setShape(std::string shape);
 
     enum phase getPhase(void) const;
     stk::StkFloat getLevel(void) const;
@@ -37,6 +36,8 @@ protected:
     // time is measured in samples
     std::vector<std::pair<long, stk::StkFloat>> opening;
     std::vector<std::pair<long, stk::StkFloat>> closing;
+
+    long sampleRate;
 
     // state variables
 
