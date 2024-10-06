@@ -188,11 +188,18 @@ long getTime(stk::StkFloat level, pairvec *pairs) {
 }
 
 void Blanket::keyOn() {
+    // warn on double press
+    if(held) {
+        std::cerr << "Warning: Blanket::keyOn() called twice in a row. Ignoring second call\n";
+        return;
+    }
+    held = true;
+
     // update index
     switch(phase) {
     // early repress
     case OPENING:
-    case SUSTAIN:
+    case SUSTAIN: // should not be possible
     case CLOSING:
         time = getTime(level, &opening);
         break;
@@ -201,27 +208,27 @@ void Blanket::keyOn() {
         time = 0;
         break;
     }
-    
-    // update other state variables (do not touch level)
-    held = true;
+
     phase = OPENING;
 }
 
 void Blanket::keyOff() {
+    // warn on double release
+    if(!held) {
+        std::cerr << "Warning: Blanket::keyOff() called twice in a row. Ignoring second call\n";
+        return;
+    }
     held = false;
+
     switch(phase) {
-    case SUSTAIN: // normal release
+    case SUSTAIN: // regular release
         phase = CLOSING;
-        index = 0;
+        time = 0;
         break;
     case CLOSING: // should not be possible
-        std::cerr << "Warning: Blanket::keyOff() called while in CLOSING phase\n";
-        break;
     case IDLE: // also should not be possible
-        std::cerr << "Warning: Blanket::keyOff() called while in IDLE phase\n";
-        break;
     case OPENING: // early release, do nothing
-        ;
+        break;
     }
 }
 
