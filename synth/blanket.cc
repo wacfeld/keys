@@ -23,26 +23,20 @@ stk::StkFloat Blanket::getLevel() const {
     return level;
 }
 
-static bool pairsValid(pairvec pairs) {
-    for(auto pair : pairs) {
-        if(pair.first < 0) {
-            std::cerr << "Warning: time must be non-negative, Blanket instance received " << pair.first << std::endl;
-            return false;
-        }
-        if(pair.second < 0 || pair.second > 1) {
-            std::cerr << "Warning: target must be be between 0 and 1, Blanket instance received " << pair.second << std::endl;
-            return false;
-        }
-    }
-    return true;
-}
-
 // input is seconds, output is samples
 long Blanket::calcSamples(stk::StkFloat s) {
     // minimum allowed delay is 0, so for example calcDelay(0) == 1
     long d = s * sampleRate;
     return (d == 0) ? 1 : d;
 }
+
+// custom exception for when parsing fails input validation
+class BlanketParseException: public std::exception {
+public:
+    char *what() {
+        return (char *)"Blanket parsing error";
+    }
+};
 
 pairvec Blanket::parsePairs(std::string s) {
     // split by commas
@@ -62,6 +56,16 @@ pairvec Blanket::parsePairs(std::string s) {
     for(size_t i = 0; i < tokens.size(); i++) {
         stk::StkFloat time, target;
         sscanf(tokens[i].c_str(), "%lf:%lf", &time, &target);
+
+        // do input validation
+        if(time < 0) {
+            std::cerr << "Warning: time must be non-negative, Blanket received " << time << std::endl;
+            throw BlanketParseException();
+        }
+        if(target < 0 || target > 1) {
+            std::cerr << "Warning: target must be between 0 and 1, Blanket received " << target << std::endl;
+            throw BlanketParseException();
+        }
 
         samp += calcSamples(time);
         pairs.emplace_back(samp, target);
@@ -97,27 +101,38 @@ pairvec Blanket::parsePairs(std::string s) {
 // - instantaneously go to 1
 // - sustain at 1
 // - instantaneously go to 0
-//
-// setShape() returns 1 on success and 0 on failure
-int Blanket::setShape(std::string shape) {
+void Blanket::setShape(std::string shape) {
     // get strings on either side of the semicolon
     size_t i = shape.find(";");
     if(i == shape.npos) {
-        std::cerr << "Blanket: could not find semicolon in shape string \"" << shape << "\"\n";
-        return 0;
+        std::cerr << "Blanket::setShape(): could not find semicolon in shape string \"" << shape << "\"\n";
+        return;
     }
 
-    auto open = parsePairs(shape.substr(0, i));
-    auto close = parsePairs(shape.substr(i));
-
-    if(!pairsValid(open) || !pairsValid(close)) {
-        return 0;
+    pairvec open;
+    pairvec close;
+    try {
+        open = parsePairs(shape.substr(0, i));
+        close = parsePairs(shape.substr(i));
+    } catch (BlanketParseException &e) {
+        std::cerr << "Blanket::setShape() failed\n";
+        return;
     }
 
-    if(open.size() == 0) {
-        std::cerr << "Blanket: opening shape cannot be empty\n";
-        return 0;
+    if(open.empty()) {
+        std::cerr << "Blanket::setShape(): opening shape cannot be empty\n";
+        return;
     }
+
+    // make sure the start time is 0
+    if(open.front().first != 0) {
+        open.emplace(open.begin(), 0, 0);
+    }
+    // make sure the end level is 0
+    if(close.empty() || close.back().second != 0) {
+        close.emplace_back(close.back().first+1, 0);
+    }
+
 
     opening = open;
     closing = close;
@@ -126,8 +141,6 @@ int Blanket::setShape(std::string shape) {
     if(closing.size() == 0 || closing.back().second != 0) {
         closing.emplace_back(0, 0);
     }
-
-    return 1;
 }
 
 // because we allow so much freedom in defining the shape of the envelope, entering it from a non-zero level can be nontrivial.

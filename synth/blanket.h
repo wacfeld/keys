@@ -20,7 +20,7 @@ public:
     void keyOn(void);
     void keyOff(void);
     
-    int setShape(std::string shape);
+    void setShape(std::string shape);
 
     enum phase getPhase(void) const;
     stk::StkFloat getLevel(void) const;
