@@ -16,13 +16,13 @@ public:
     enum phase {OPENING, CLOSING, SUSTAIN, IDLE};
 
     Blanket(void);
-    Blanket(std::string shape);
+    Blanket(std::string shape, stk::StkFloat sampleRate);
     ~Blanket(void);
 
     void keyOn(void);
     void keyOff(void);
     
-    int setShape(std::string shape);
+    int setShape(std::string shape, stk::StkFloat sampleRate);
 
     enum phase getPhase(void) const;
     stk::StkFloat getLevel(void) const;
@@ -31,11 +31,8 @@ public:
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);
 
 protected:
-    void sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate);
     std::vector<std::pair<stk::StkFloat, stk::StkFloat>> *curPairs();
     void reachedTarget(void);
-
-    stk::StkFloat sampleRate;
 
     // vectors of (time, target) pairs for the when the note is held (opening) and released (closing)
     std::vector<std::pair<stk::StkFloat, stk::StkFloat>> opening;

@@ -12,27 +12,22 @@ Blanket::Blanket(void) {
     opening.emplace_back(0, 1);
     // instant release
     closing.emplace_back(0, 0);
-
-    Stk::addSampleRateAlert(this);
 }
 
-Blanket::Blanket(std::string shape) {
+Blanket::Blanket(std::string shape, stk::StkFloat sampleRate) {
     held = false;
     phase = IDLE;
     index = 0;
 
-    int success = setShape(shape);
+    int success = setShape(shape, sampleRate);
     // if shape string was invalid, default to simple envelope
     if(!success) {
         opening.emplace_back(0, 1);
         closing.emplace_back(0, 0);
     }
-
-    Stk::addSampleRateAlert(this);
 }
 
 Blanket::~Blanket(void) {
-    Stk::removeSampleRateAlert(this);
 }
 
 enum Blanket::phase Blanket::getPhase() const {
@@ -41,12 +36,6 @@ enum Blanket::phase Blanket::getPhase() const {
 
 stk::StkFloat Blanket::getLevel() const {
     return level;
-}
-
-void Blanket::sampleRateChanged(stk::StkFloat newRate, stk::StkFloat oldRate) {
-    if(!ignoreSampleRateChange_) {
-        sampleRate = newRate;
-    }
 }
 
 static bool pairsValid(pairvec pairs) {
@@ -113,7 +102,7 @@ static pairvec parsePairs(std::string s) {
 // - instantaneously go to 0
 //
 // setShape() returns 1 on success and 0 on failure
-int Blanket::setShape(std::string shape) {
+int Blanket::setShape(std::string shape, stk::StkFloat sampleRate) {
     // get strings on either side of the semicolon
     size_t i = shape.find(";");
     if(i == shape.npos) {
