@@ -133,56 +133,48 @@ void Blanket::setShape(std::string shape) {
         close.emplace_back(close.back().first+1, 0);
     }
 
-
+    // assign respective fields
     opening = open;
     closing = close;
-
-    // if closing is empty or ends with nonzero target, infer an instantaneous drop to 0
-    if(closing.size() == 0 || closing.back().second != 0) {
-        closing.emplace_back(0, 0);
-    }
 }
 
-// because we allow so much freedom in defining the shape of the envelope, entering it from a non-zero level can be nontrivial.
-// let f(x) be the function of the shape of the opening portion of the envelope. let C be the current value of the envelope. keyOn() does the following:
+// when repressing or releasing early, we may have to enter the opening/closing phase from a nonzero time
+// this function calculates that time
 //
-// - if the line y=C intersects with f(x), start on the leftmost intersection point
-// - if they do not intersect, start at the rightmost peak of the graph f(x)
+// let f(x) be the function of the shape of the opening portion of the envelope. let C be the current value of the envelope. we do the following:
 //
-// getIndex() implements the above logic
-size_t getIndex(stk::StkFloat level, pairvec pairs) {
-    if(pairs.size() == 0) {
-        std::cerr << "unreachable state in Blanket::getIndex(): pairs is empty\n";
+// - if the line y=C intersects with f(x), return the time at the leftmost intersection point
+// - if they do not intersect, start at the left peak of the graph f(x)
+//
+// this second rule is kind of ugly but it should not show up often under normal usage (envelopes that mimic real intruments)
+long getTime(stk::StkFloat level, pairvec *pairs) {
+    if(pairs->size() < 2) {
+        std::cerr << "unreachable state in Blanket::getIndex(): pairs has size " << pairs->size() << ", size of at least 2 required\n";
         return 0;
     }
 
-    // extract the targets into a vector for easier logic below
-    std::vector<stk::StkFloat> targets;
-    // append an implicit zero (getIndex() is only used for opening, not closing)
-    targets.push_back(0);
-    for(auto pair : pairs) {
-        targets.push_back(pair.second);
-    }
-
     // find first intersection point
-    for(size_t i = 0; i < targets.size()-1; i++) {
-        stk::StkFloat before=targets[i], after=targets[i+1];
-        if(before <= level && level < after) {
-            return i;
+    for(size_t i = 0; i < pairs->size()-1; i++) {
+        // unpack values
+        long x1 = (*pairs)[i].first, x2 = (*pairs)[i+1].first;
+        stk::StkFloat y1=(*pairs)[i].second, y2=(*pairs)[i+1].second;
+
+        // check if level is in [before, after) or (after, before]
+        if((y1 <= level && level < y2) || (y2 < level && level <= y1)) {
+            // interpolate
+            return x1 + (x2-x1) * (level-y1) / (y2-y1);
         }
     }
 
-    // if no intersection points, find max (break ties with leftmost)
-    // remove implicit zero from before
-    targets.erase(targets.begin());
+    // find leftmost peak
     size_t maxind = 0;
-    for(size_t i = 1; i < pairs.size(); i++) {
-        if(targets[i] >= targets[maxind]) { // >= to get rightmost
+    for(size_t i = 1; i < pairs->size(); i++) {
+        if((*pairs)[i] > (*pairs)[maxind]) {
             maxind = i;
         }
     }
     
-    return maxind;
+    return (*pairs)[maxind].first;
 }
 
 void Blanket::keyOn() {
