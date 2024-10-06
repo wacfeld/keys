@@ -15,7 +15,7 @@ class Blanket: public stk::Generator {
 public:
     enum phase {OPENING, CLOSING, SUSTAIN, IDLE};
 
-    Blanket(stk::stkFloat sampleRate);
+    Blanket(stk::StkFloat sampleRate);
 
     void keyOn(void);
     void keyOff(void);
@@ -31,6 +31,8 @@ public:
 protected:
     std::vector<std::pair<long, stk::StkFloat>> *curPairs();
     void reachedTarget(void);
+    long calcSamples(stk::StkFloat s);
+    std::vector<std::pair<long, stk::StkFloat>> parsePairs(std::string s);
 
     // vectors of (time, target) pairs for the when the note is held (opening) and released (closing)
     // time is measured in samples

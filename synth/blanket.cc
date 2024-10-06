@@ -3,7 +3,7 @@
 typedef std::vector<std::pair<long, stk::StkFloat>> pairvec;
 
 // default constructor sets the most simple envelope possible
-Blanket::Blanket(stk::stkFloat sampleRate) {
+Blanket::Blanket(stk::StkFloat sampleRate) {
     // initialize variables
     phase = IDLE;
     time = 0;
@@ -38,13 +38,13 @@ static bool pairsValid(pairvec pairs) {
 }
 
 // input is seconds, output is samples
-long calcSamples(stk::StkFloat s) {
+long Blanket::calcSamples(stk::StkFloat s) {
     // minimum allowed delay is 0, so for example calcDelay(0) == 1
     long d = s * sampleRate;
     return (d == 0) ? 1 : d;
 }
 
-static pairvec parsePairs(std::string s) {
+pairvec Blanket::parsePairs(std::string s) {
     // split by commas
     std::vector<std::string> tokens;
     size_t pos = 0;
@@ -99,7 +99,7 @@ static pairvec parsePairs(std::string s) {
 // - instantaneously go to 0
 //
 // setShape() returns 1 on success and 0 on failure
-int Blanket::setShape(std::string shape, stk::StkFloat sampleRate) {
+int Blanket::setShape(std::string shape) {
     // get strings on either side of the semicolon
     size_t i = shape.find(";");
     if(i == shape.npos) {
