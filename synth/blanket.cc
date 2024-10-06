@@ -3,31 +3,28 @@
 typedef std::vector<std::pair<stk::StkFloat, stk::StkFloat>> pairvec;
 
 // default constructor sets the most simple envelope possible
-Blanket::Blanket(void) {
-    held = false;
+Blanket::Blanket(stk::stkFloat sampleRate) {
+    // initialize state variables
     phase = IDLE;
-    index = 0;
+    time = 0;
+    held = false;
+    level = 0;
 
-    // instant attack with a target/sustain of 1
-    opening.emplace_back(0, 1);
-    // instant release
-    closing.emplace_back(0, 0);
+    // set instant attack and release
+    setShape("0:1;0:0", sampleRate);
 }
 
 Blanket::Blanket(std::string shape, stk::StkFloat sampleRate) {
-    held = false;
     phase = IDLE;
-    index = 0;
+    time = 0;
+    held = false;
+    level = 0;
 
     int success = setShape(shape, sampleRate);
     // if shape string was invalid, default to simple envelope
     if(!success) {
-        opening.emplace_back(0, 1);
-        closing.emplace_back(0, 0);
+        setShape("0:1;0:0", sampleRate);
     }
-}
-
-Blanket::~Blanket(void) {
 }
 
 enum Blanket::phase Blanket::getPhase() const {

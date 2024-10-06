@@ -15,9 +15,8 @@ class Blanket: public stk::Generator {
 public:
     enum phase {OPENING, CLOSING, SUSTAIN, IDLE};
 
-    Blanket(void);
+    Blanket(stk::stkFloat sampleRate);
     Blanket(std::string shape, stk::StkFloat sampleRate);
-    ~Blanket(void);
 
     void keyOn(void);
     void keyOff(void);
@@ -31,12 +30,13 @@ public:
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);
 
 protected:
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> *curPairs();
+    std::vector<std::pair<long, stk::StkFloat>> *curPairs();
     void reachedTarget(void);
 
     // vectors of (time, target) pairs for the when the note is held (opening) and released (closing)
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> opening;
-    std::vector<std::pair<stk::StkFloat, stk::StkFloat>> closing;
+    // time is measured in samples
+    std::vector<std::pair<long, stk::StkFloat>> opening;
+    std::vector<std::pair<long, stk::StkFloat>> closing;
 
     // state variables
 
@@ -46,7 +46,7 @@ protected:
     // what phase of the envelope are we in?
     enum phase phase;
     // if the phase is opening or closing, what's our current target? (see the above vectors)
-    int index;
+    long time;
     // is the key currently held? (used to determine whether to sustain)
     bool held;
     // what level is the envelope at? (somewhere in [0,1])
