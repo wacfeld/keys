@@ -160,9 +160,19 @@ long getTime(stk::StkFloat level, pairvec *pairs) {
         stk::StkFloat y1=(*pairs)[i].second, y2=(*pairs)[i+1].second;
 
         // check if level is in [before, after) or (after, before]
-        if((y1 <= level && level < y2) || (y2 < level && level <= y1)) {
+        if((y1 <= level && level <= y2) || (y2 <= level && level <= y1)) {
             // interpolate
-            return x1 + (x2-x1) * (level-y1) / (y2-y1);
+            long lvl;
+            if(y1 == y2) { // avoid divide by zero case when levels are equal
+                lvl = x1;
+            } else {
+                lvl = x1 + (x2-x1) * (level-y1) / (y2-y1);
+            }
+
+            // make sure no strange floating point errors arise
+            if(lvl < x1) return x1;
+            else if(lvl > x2) return x2;
+            else return lvl;
         }
     }
 
