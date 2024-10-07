@@ -253,15 +253,18 @@ void Blanket::nextPhase() {
         if(held) {
             phase = SUSTAIN;
             time = 0;
+            level = getSustainLevel();
         } else {
             phase = CLOSING;
             time = 0;
+            level = closing[0].second;
         }
     }
 
     else if(phase == CLOSING) {
         phase = IDLE;
         time = 0;
+        level = 0;
     }
 
     else {
@@ -305,30 +308,11 @@ inline stk::StkFloat Blanket::tick(void) {
     stk::StkFloat lvl = time2level(pairs, time);
 
     if(lvl == -1) {
-
-    }
-
-    // where did we come from, where are we going, and how much time total do we have to do that?
-    stk::StkFloat origin, target, time;
-    origin = (index == 0) ? 0 : (*pairs)[index-1].second;
-    target = (*pairs)[index].second;
-    time = (*pairs)[index].first;
-
-    // special case: if time is 0, jump immediately
-    if(time == 0) {
-        reachedTarget();
-        return target;
-    }
-
-    // from the above variables, we calculate the rate that we need to travel this next step
-    stk::StkFloat rate = (target-origin)/time;
-    level += rate;
-
-    // check if we've reached (or exceeded) our target
-    stk::StkFloat diff = target - origin;
-    if((diff < 0 && level <= target) || (diff > 0 && level >= target)) {
-        level = target;
-        reachedTarget();
+        nextPhase();
+        return level;
+    } else {
+        level = lvl;
+        return level;
     }
 }
 
