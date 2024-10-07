@@ -326,3 +326,17 @@ stk::StkFrames &Blanket::tick(stk::StkFrames &frames, unsigned int channel) {
     }
     return frames;
 }
+
+void Blanket::printInfo() {
+    std::cout << "Sample rate " << sampleRate << std::endl;
+
+    puts("Opening:");
+    for(size_t i = 0; i < opening.size(); i++) {
+        printf("%ld, %f\n", opening[i].first, opening[i].second);
+    }
+
+    puts("Closing:");
+    for(size_t i = 0; i < closing.size(); i++) {
+        printf("%ld, %f\n", closing[i].first, closing[i].second);
+    }
+}

@@ -29,6 +29,8 @@ public:
     stk::StkFloat tick(void);
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);
 
+    void printInfo(void);
+
 protected:
     std::vector<std::pair<long, stk::StkFloat>> *curPairs();
     void nextPhase(void);
