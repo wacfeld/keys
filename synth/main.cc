@@ -9,10 +9,13 @@
 #include "matrix.h"
 #include "utils.h"
 #include "wavetable.h"
+#include "blanket.h"
 
 #define N_KEYS 25
 #define N_OUT 5
 #define N_IN 5
+
+#define SAMPLERATE 44100
 
 using namespace stk;
 typedef unsigned int uint;
@@ -46,7 +49,7 @@ void handler(int s) {
 }
 
 void init(RtAudio *out, callback f, void *data) {
-    Stk::setSampleRate(44100.0);
+    Stk::setSampleRate(SAMPLERATE);
     RtAudio::StreamParameters params;
     params.deviceId = out->getDefaultOutputDevice();
     params.nChannels = 1;
@@ -73,19 +76,15 @@ void printframes(StkFrames frames) {
 }
 
 void runWave(int argc, char **argv) {
-    double attack=0.0001, decay=5, sustain=0.1, release=0.5;
-
     std::string fname = "waves/sine.raw";
-    static char usage[] = "-f: raw file name\n-a: attack\n-d: decay\n-s: sustain\n-r: release\n";
+    std::string shape = "0.01:1;0.01:0";
+    static char usage[] = "-f: raw file name\n-e: envelope shape\n";
 
     int opt;
     while((opt = getopt(argc, argv, "a:d:s:r:f:")) != -1) {
         switch(opt) {
         case 'f': fname = optarg; break;
-        case 'a': sscanf(optarg, "%lf", &attack); break;
-        case 'd': sscanf(optarg, "%lf", &decay); break;
-        case 's': sscanf(optarg, "%lf", &sustain); break;
-        case 'r': sscanf(optarg, "%lf", &release); break;
+        case 'e': shape = optarg; break;
         default: printf("%s", usage); exit(1);
         }
     }
@@ -97,8 +96,8 @@ void runWave(int argc, char **argv) {
     gpioSetSignalFunc(SIGINT, handler); // override pigpio's signal handler
 
     FileLoop wave(fname, true);
-    ADSR env;
-    env.setAllTimes(attack, decay, sustain, release);
+    Blanket env(SAMPLERATE);
+    env.setShape(shape);
     
     // create WavData
     WavData data(wave, env, &mat, freqs);
