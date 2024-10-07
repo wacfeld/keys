@@ -81,7 +81,7 @@ void runWave(int argc, char **argv) {
     static char usage[] = "-f: raw file name\n-e: envelope shape\n";
 
     int opt;
-    while((opt = getopt(argc, argv, "a:d:s:r:f:")) != -1) {
+    while((opt = getopt(argc, argv, "e:f:")) != -1) {
         switch(opt) {
         case 'f': fname = optarg; break;
         case 'e': shape = optarg; break;
