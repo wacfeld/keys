@@ -114,7 +114,7 @@ void Blanket::setShape(std::string shape) {
     pairvec close;
     try {
         open = parsePairs(shape.substr(0, i));
-        close = parsePairs(shape.substr(i));
+        close = parsePairs(shape.substr(i+1));
     } catch (BlanketParseException &e) {
         std::cerr << "Blanket::setShape() failed\n";
         return;
@@ -125,11 +125,12 @@ void Blanket::setShape(std::string shape) {
         return;
     }
 
-    // make sure the start time is 0
-    if(open.front().first != 0) {
-        open.emplace(open.begin(), 0, 0);
-    }
-    // make sure the end level is 0
+    // set start of opening to level 0
+    open.emplace(open.begin(), 0, 0);
+    // set start of closing to sustain level
+    close.emplace(close.begin(), 0, open.back().second);
+
+    // make sure closing ends at level 0
     if(close.empty() || close.back().second != 0) {
         close.emplace_back(close.back().first+1, 0);
     }
