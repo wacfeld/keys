@@ -233,7 +233,11 @@ void Blanket::keyOff() {
 }
 
 pairvec *Blanket::curPairs() {
-    if(phase != OPENING && phase != CLOSING) {
+    if(phase == OPENING) {
+        return &opening;
+    } else if(phase == CLOSING) {
+        return &closing;
+    } else {
         std::cerr << "Blanket::curPairs() called outside of opening or closing\n";
         return nullptr;
     }
