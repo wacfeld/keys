@@ -47,6 +47,7 @@ pairvec Blanket::parsePairs(std::string s) {
         tokens.push_back(token);
         s.erase(0, pos+1);
     }
+    tokens.push_back(s);
 
     // keep track of the time in samples
     pairvec pairs;
