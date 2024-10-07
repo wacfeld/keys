@@ -243,26 +243,29 @@ pairvec *Blanket::curPairs() {
     }
 }
 
-// we reached our target, now increment the index or switch to the next phase
-void Blanket::reachedTarget() {
-    if(phase != OPENING && phase != CLOSING) {
-        std::cerr << "Blanket::reachedTarget() called outside of opening or closing\n";
+stk::StkFloat Blanket::getSustainLevel() const {
+    return opening.back().second;
+}
+
+// we completed one phase, now increment the index or switch to the next phase
+void Blanket::nextPhase() {
+    if(phase == OPENING) {
+        if(held) {
+            phase = SUSTAIN;
+            time = 0;
+        } else {
+            phase = CLOSING;
+            time = 0;
+        }
     }
 
-    index++;
-    pairvec *pairs = curPairs();
+    else if(phase == CLOSING) {
+        phase = IDLE;
+        time = 0;
+    }
 
-    if(index >= pairs->size()) {
-        if(phase == OPENING) {
-            if(held) {
-                phase = SUSTAIN;
-            } else {
-                phase = CLOSING;
-            }
-        }
-        else if(phase == CLOSING) {
-            phase = IDLE;
-        }
+    else {
+        std::cerr << "Warning: Blanket::nextPhase() called outside of opening or closing\n";
     }
 }
 
@@ -271,8 +274,8 @@ inline stk::StkFloat Blanket::tick(void) {
     // otherwise set pairs to be either opening or closing
     pairvec *pairs;
     switch(phase) {
-    case IDLE: return 0;
-    case SUSTAIN: return opening.back().second;
+    case IDLE: level = 0; return level;
+    case SUSTAIN: level = opening.back().second; return level;
     case OPENING:
     case CLOSING:
         pairs = curPairs();

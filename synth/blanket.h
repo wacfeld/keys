@@ -24,13 +24,14 @@ public:
 
     enum phase getPhase(void) const;
     stk::StkFloat getLevel(void) const;
+    stk::StkFloat getSustainLevel() const;
 
     stk::StkFloat tick(void);
     stk::StkFrames &tick(stk::StkFrames &frames, unsigned int channel=0);
 
 protected:
     std::vector<std::pair<long, stk::StkFloat>> *curPairs();
-    void reachedTarget(void);
+    void nextPhase(void);
     long calcSamples(stk::StkFloat s);
     std::vector<std::pair<long, stk::StkFloat>> parsePairs(std::string s);
 
