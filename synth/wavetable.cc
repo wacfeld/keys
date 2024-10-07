@@ -9,7 +9,7 @@
 
 using namespace stk;
 
-WavData::WavData(FileLoop wave, ADSR env, Matrix *mat, double *freqs) {
+WavData::WavData(FileLoop wave, Blanket env, Matrix *mat, double *freqs) {
     // process matrix info
     this->mat = mat;
     this->n = mat->keys;

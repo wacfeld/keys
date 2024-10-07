@@ -1,12 +1,12 @@
 #ifndef WAVETABLE_H
 #define WAVETABLE_H
 
-#include <ADSR.h>
 #include <FileLoop.h>
 #include <vector>
 #include <set>
 
 #include "matrix.h"
+#include "blanket.h"
 
 class WavData {
 public:
@@ -14,11 +14,10 @@ public:
     Matrix *mat;
     std::set<int> held;
 
-    // ADSR = attack, decay, sustain, release envelope
-    std::vector<stk::ADSR> envs;
+    std::vector<Blanket> envs;
     std::vector<stk::FileLoop> waves;
 
-    WavData(stk::FileLoop wave, stk::ADSR env, Matrix *mat, double *freqs);
+    WavData(stk::FileLoop wave, Blanket env, Matrix *mat, double *freqs);
 };
 
 // data is a Matrix pointer (see matrix.h)
