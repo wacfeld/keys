@@ -119,8 +119,27 @@ void runWave(int argc, char **argv) {
     cleanupMatrix();
 }
 
+void printtick(Blanket *b, int n) {
+    for(int i = 0; i < n; i++) {
+        auto f = b->tick();
+        printf("%f\n", f);
+    }
+}
+
+void blanketTest() {
+    Blanket b(SAMPLERATE);
+    b.setShape("0.01:1;0.01:0");
+    b.printInfo();
+    printtick(&b, 5);
+    b.keyOn();
+    printtick(&b, 442);
+    b.keyOff();
+    printtick(&b, 442);
+}
+
 int main(int argc, char *argv[])
 {
+    //blanketTest();
     runWave(argc, argv);
     return 0;
 }
