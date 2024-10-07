@@ -269,16 +269,43 @@ void Blanket::nextPhase() {
     }
 }
 
+// returns level for current time in current phase
+// returns -1 if time has exceeded phase length
+stk::StkFloat time2level(pairvec *pairs, long time) {
+    if(time > (*pairs).back().second) {
+        return -1;
+    }
+
+    for(size_t i = 0; i < pairs->size()-1; i++) {
+        long x1 = (*pairs)[i].first, x2 = (*pairs)[i+1].first;
+        if(x1 <= time && time <= x2) {
+            stk::StkFloat y1=(*pairs)[i].second, y2=(*pairs)[i+1].second;
+            return y1 + (y2-y1) * (time - x1) / (x2 - x1);
+        }
+    }
+
+    std::cerr << "Warning: Unreachable state reached in time2level()\n";
+    return -1;
+}
+
 inline stk::StkFloat Blanket::tick(void) {
+    
     // if IDLE or SUSTAIN, return appropriate value
-    // otherwise set pairs to be either opening or closing
-    pairvec *pairs;
-    switch(phase) {
-    case IDLE: level = 0; return level;
-    case SUSTAIN: level = opening.back().second; return level;
-    case OPENING:
-    case CLOSING:
-        pairs = curPairs();
+    if(phase == IDLE) {
+        level = 0;
+        return level;
+    } else if(phase == SUSTAIN) {
+        level = getSustainLevel();
+        return level;
+    }
+
+    // otherwise increment time and calculate new level
+    pairvec *pairs = curPairs();
+    time++;
+    stk::StkFloat lvl = time2level(pairs, time);
+
+    if(lvl == -1) {
+
     }
 
     // where did we come from, where are we going, and how much time total do we have to do that?
