@@ -276,7 +276,7 @@ void Blanket::nextPhase() {
 // returns level for current time in current phase
 // returns -1 if time has exceeded phase length
 stk::StkFloat time2level(pairvec *pairs, long time) {
-    if(time > (*pairs).back().second) {
+    if(time > (*pairs).back().first) {
         return -1;
     }
 
