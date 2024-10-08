@@ -30,6 +30,14 @@ def sawtooth():
 
 ## sophisticated waves
 
+def quad(f):
+    d = f()
+    d4 = double(double(f()))
+    data = (d + d4/4) / 2
+    return data.astype(int)
+# write(quad(triangle, 'quadtriangle.raw'))
+# write(quad(sine, 'quadsine.raw'))
+
 def marimba2():
     tri = triangle()
     # triangle wave tuned up 2 octaves
