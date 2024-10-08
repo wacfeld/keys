@@ -50,3 +50,15 @@ def marimba3():
     tri4 = double(double(triangle()))
     mar = (tri + tri4/2) / 1.5
     return mar.astype(int)
+
+# duty is a number from 0 to 100
+def pulse(duty):
+    a = int(1024 * duty/100)
+    b = 1024 - a
+    data = (32767,) * a + (-32767,) * b
+    return np.array(data)
+
+# write(pulse(10), "pulse10.raw")
+# write(pulse(20), "pulse20.raw")
+# write(pulse(30), "pulse30.raw")
+# write(pulse(40), "pulse40.raw")
