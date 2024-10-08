@@ -1,4 +1,5 @@
-// simple envelope + wavetable keyboard setup
+// simple envelope + waveform keyboard setup
+// it's actually a rompler and not a wavetable
 
 #include <Stk.h>
 #include <RtAudio.h>
