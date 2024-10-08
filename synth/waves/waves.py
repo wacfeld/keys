@@ -24,7 +24,8 @@ def square():
     return np.array(data)
 
 def triangle():
-    data = [INTMAX*i//256 for i in range(256)] + [-INTMAX*i//256 + INTMAX for i in range(512)] + [INTMAX*i//256 - INTMAX for i in range(256)]
+    data = [INTMAX*i//256 - INTMAX for i in range(512)] + [-INTMAX*i//256 + INTMAX for i in range(512)]
+    #data = [INTMAX*i//256 for i in range(256)] + [-INTMAX*i//256 + INTMAX for i in range(512)] + [INTMAX*i//256 - INTMAX for i in range(256)]
     return np.array(data)
 
 def sawtooth():
