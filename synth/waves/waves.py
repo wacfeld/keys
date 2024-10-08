@@ -4,6 +4,7 @@ from viz import plot, freqs
 from myio import read, write
 
 SEMITONE = 2**(1/12)
+INTMAX = 32767
 
 ## operators
 
@@ -15,19 +16,19 @@ def double(data):
 ## basic waves
 
 def sine():
-    data = 32767 * np.sin(np.linspace(0, np.pi*2, 1024, endpoint=False))
+    data = INTMAX * np.sin(np.linspace(0, np.pi*2, 1024, endpoint=False))
     return data.astype(int)
 
 def square():
-    data = (32767,) * 512 + (-32767,) * 512
+    data = (INTMAX,) * 512 + (-INTMAX,) * 512
     return np.array(data)
 
 def triangle():
-    data = [32767*i//256 for i in range(256)] + [-32767*i//256 + 32767 for i in range(512)] + [32767*i//256 - 32767 for i in range(256)]
+    data = [INTMAX*i//256 for i in range(256)] + [-INTMAX*i//256 + INTMAX for i in range(512)] + [INTMAX*i//256 - INTMAX for i in range(256)]
     return np.array(data)
 
 def sawtooth():
-    data = [32767*i//512 for i in range(512)] + [32767*i//512 - 32767 for i in range(512)]
+    data = [INTMAX*i//512 for i in range(512)] + [INTMAX*i//512 - INTMAX for i in range(512)]
     return np.array(data)
 
 ## sophisticated waves
@@ -74,7 +75,7 @@ def marimba3():
 def pulse(duty):
     a = int(1024 * duty/100)
     b = 1024 - a
-    data = (32767,) * a + (-32767,) * b
+    data = (INTMAX,) * a + (-INTMAX,) * b
     return np.array(data)
 
 # write(pulse(10), "pulse10.raw")
