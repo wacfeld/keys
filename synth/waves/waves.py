@@ -49,8 +49,9 @@ def quad(f):
 # scale f up by c and cut it off
 def sync(f, c):
     data = f()
-    i = int(len(data)/c)
-    return data[:i]
+    i = int(1024*c-1024)
+    return np.concatenate((data, data[:i]))
+# write(sync(sawtooth, SEMITONE**4), 'sync4sawtooth.raw')
 
 def marimba():
     tri = triangle()
