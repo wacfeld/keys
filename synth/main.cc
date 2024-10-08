@@ -15,6 +15,7 @@
 #define N_OUT 5
 #define N_IN 5
 
+//#define SAMPLERATE 48000
 #define SAMPLERATE 44100
 
 using namespace stk;
@@ -96,6 +97,7 @@ void runWave(int argc, char **argv) {
     gpioSetSignalFunc(SIGINT, handler); // override pigpio's signal handler
 
     FileLoop wave(fname, true);
+    Stk::setSampleRate(SAMPLERATE);
     Blanket env(SAMPLERATE);
     env.setShape(shape);
     
