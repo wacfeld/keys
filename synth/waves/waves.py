@@ -35,8 +35,10 @@ def quad(f):
     d4 = double(double(f()))
     data = (d + d4/4) / 2
     return data.astype(int)
-# write(quad(triangle, 'quadtriangle.raw'))
-# write(quad(sine, 'quadsine.raw'))
+# write(quad(triangle), 'quadtriangle.raw'))
+# write(quad(sine), 'quadsine.raw'))
+# write(quad(square), 'quadsquare.raw'))
+# write(quad(sawtooth), 'quadsawtooth.raw'))
 
 def marimba2():
     tri = triangle()
