@@ -3,6 +3,8 @@ import numpy as np
 from viz import plot, freqs
 from myio import read, write
 
+SEMITONE = 2**(1/12)
+
 ## operators
 
 def double(data):
@@ -30,6 +32,7 @@ def sawtooth():
 
 ## sophisticated waves
 
+# consume another wave function and add it to its quadrupling
 def quad(f):
     d = f()
     d4 = double(double(f()))
@@ -40,12 +43,11 @@ def quad(f):
 # write(quad(square), 'quadsquare.raw'))
 # write(quad(sawtooth), 'quadsawtooth.raw'))
 
-def marimba2():
-    tri = triangle()
-    # triangle wave tuned up 2 octaves
-    tri4 = double(double(triangle()))
-    mar = (tri + tri4*3/4) / 1.75
-    return mar.astype(int)
+# scale f up by c and cut it off
+def sync(f, c):
+    data = f()
+    i = int(len(data)/c)
+    return data[:i]
 
 def marimba():
     tri = triangle()
@@ -53,6 +55,13 @@ def marimba():
     tri4 = double(double(triangle()))
     mar = (tri + tri4) // 2
     return mar
+
+def marimba2():
+    tri = triangle()
+    # triangle wave tuned up 2 octaves
+    tri4 = double(double(triangle()))
+    mar = (tri + tri4*3/4) / 1.75
+    return mar.astype(int)
 
 def marimba3():
     tri = triangle()
