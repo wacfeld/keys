@@ -28,7 +28,8 @@ def triangle():
     return np.array(data)
 
 def sawtooth():
-    data = [INTMAX*i//512 for i in range(512)] + [INTMAX*i//512 - INTMAX for i in range(512)]
+    data = [INTMAX*i//512 - INTMAX for i in range(1024)]
+    #data = [INTMAX*i//512 for i in range(512)] + [INTMAX*i//512 - INTMAX for i in range(512)]
     return np.array(data)
 
 ## sophisticated waves
