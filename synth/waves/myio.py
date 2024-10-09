@@ -19,9 +19,9 @@ def write(data, fname, overwrite=False):
     content = struct.pack('>' + 'h' * len(data), *data)
 
     # write
-    print(f'writing {len(data)} samples to {fname}')
     with open(fname, 'wb') as file:
         file.write(content)
+        print(f'wrote {len(data)} samples to {fname}')
 
 def read(fname):
     with open(fname, 'rb') as file:

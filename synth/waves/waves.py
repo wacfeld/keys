@@ -33,7 +33,7 @@ def sawtooth():
     #data = [INTMAX*i//512 for i in range(512)] + [INTMAX*i//512 - INTMAX for i in range(512)]
     return np.array(data)
 
-## sophisticated waves
+## functionals
 
 # consume another wave function and add it to its quadrupling
 def quad(f):
@@ -56,6 +56,8 @@ def sync(f, c):
 # write(sync(sawtooth, SEMITONE**8), 'sync8sawtooth.raw')
 # write(sync(sawtooth, SEMITONE**16), 'sync16sawtooth.raw')
 # write(sync(sawtooth, SEMITONE**20), 'sync20sawtooth.raw')
+
+## sophisticated waves
 
 def marimba():
     tri = triangle()
