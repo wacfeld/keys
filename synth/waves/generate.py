@@ -17,3 +17,8 @@ if __name__ == '__main__':
     write(quad(sine), 'quadsine.raw', overwrite=True)
     write(quad(square), 'quadsquare.raw', overwrite=True)
     write(quad(sawtooth), 'quadsawtooth.raw', overwrite=True)
+
+    write(sync(sawtooth, SEMITONE**4), 'sync4sawtooth.raw', overwrite=True)
+    write(sync(sawtooth, SEMITONE**8), 'sync8sawtooth.raw', overwrite=True)
+    write(sync(sawtooth, SEMITONE**16), 'sync16sawtooth.raw', overwrite=True)
+    write(sync(sawtooth, SEMITONE**20), 'sync20sawtooth.raw', overwrite=True)
