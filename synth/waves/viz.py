@@ -31,20 +31,21 @@ def freqs(data, title=None, threshold=0.001):
     ft = np.abs(fft(data))
     pos = ft[:len(ft)//2]
 
-    # remove trailing tiny values
-    if threshold != None:
-        # get max
-        m = np.max(pos)
+    ## remove trailing tiny values
+    #if threshold != None:
+    #    # get max
+    #    m = np.max(pos)
 
-        # array of booleans flagging very small values
-        small = (pos/m < threshold)
-        # indices of non-small values
-        nonsmalls = np.where(np.logical_not(small))[0]
-        if len(nonsmalls) != 0:
-            # get index of last non-small value, add 2, and cap at length of array
-            i = min(nonsmalls[-1] + 2, len(pos))
-            pos = pos[:i]
+    #    # array of booleans flagging very small values
+    #    small = (pos/m < threshold)
+    #    # indices of non-small values
+    #    nonsmalls = np.where(np.logical_not(small))[0]
+    #    if len(nonsmalls) != 0:
+    #        # get index of last non-small value, add 2, and cap at length of array
+    #        i = min(nonsmalls[-1] + 2, len(pos))
+    #        pos = pos[:i]
 
+    # make y axis logarithmic
     pos = 10*np.log10(pos)
     pos[pos==-inf] = -200
 
@@ -52,9 +53,9 @@ def freqs(data, title=None, threshold=0.001):
     if title is not None:
         plt.title(title)
     plt.xlabel('Hz')
-    plt.ylabel('amplitude')
+    plt.ylabel('db')
     plt.ylim(bottom=-100)
-    plt.xlim(right=50)
+    #plt.xlim(right=50)
     plt.xlim(left=0)
     plt.show()
 
