@@ -41,10 +41,10 @@ def quad(f):
     d4 = double(double(f()))
     data = (d + d4/4) / 2
     return data.astype(int)
-# write(quad(triangle), 'quadtriangle.raw'))
-# write(quad(sine), 'quadsine.raw'))
-# write(quad(square), 'quadsquare.raw'))
-# write(quad(sawtooth), 'quadsawtooth.raw'))
+# write(quad(triangle), 'quadtriangle.raw')
+# write(quad(sine), 'quadsine.raw')
+# write(quad(square), 'quadsquare.raw')
+# write(quad(sawtooth), 'quadsawtooth.raw')
 
 # scale f up by c and cut it off
 def sync(f, c):
@@ -58,27 +58,6 @@ def sync(f, c):
 # write(sync(sawtooth, SEMITONE**20), 'sync20sawtooth.raw')
 
 ## sophisticated waves
-
-def marimba():
-    tri = triangle()
-    # triangle wave tuned up 2 octaves
-    tri4 = double(double(triangle()))
-    mar = (tri + tri4) // 2
-    return mar
-
-def marimba2():
-    tri = triangle()
-    # triangle wave tuned up 2 octaves
-    tri4 = double(double(triangle()))
-    mar = (tri + tri4*3/4) / 1.75
-    return mar.astype(int)
-
-def marimba3():
-    tri = triangle()
-    # triangle wave tuned up 2 octaves
-    tri4 = double(double(triangle()))
-    mar = (tri + tri4/2) / 1.5
-    return mar.astype(int)
 
 # duty is a number from 0 to 100
 def pulse(duty):
