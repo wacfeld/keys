@@ -2,7 +2,6 @@ from waves import *
 from myio import write
 
 if __name__ == '__main__':
-    # basic shapes
     write(sine(), 'sine.raw', overwrite=True)
     write(square(), 'square.raw', overwrite=True)
     write(triangle(), 'triangle.raw', overwrite=True)
@@ -22,3 +21,18 @@ if __name__ == '__main__':
     write(sync(sawtooth, SEMITONE**8), 'sync8sawtooth.raw', overwrite=True)
     write(sync(sawtooth, SEMITONE**16), 'sync16sawtooth.raw', overwrite=True)
     write(sync(sawtooth, SEMITONE**20), 'sync20sawtooth.raw', overwrite=True)
+
+    write(sync(sine, SEMITONE**4), 'sync4sine.raw', overwrite=True)
+    write(sync(sine, SEMITONE**8), 'sync8sine.raw', overwrite=True)
+    write(sync(sine, SEMITONE**16), 'sync16sine.raw', overwrite=True)
+    write(sync(sine, SEMITONE**20), 'sync20sine.raw', overwrite=True)
+
+    write(sync(triangle, SEMITONE**4), 'sync4triangle.raw', overwrite=True)
+    write(sync(triangle, SEMITONE**8), 'sync8triangle.raw', overwrite=True)
+    write(sync(triangle, SEMITONE**16), 'sync16triangle.raw', overwrite=True)
+    write(sync(triangle, SEMITONE**20), 'sync20triangle.raw', overwrite=True)
+
+    write(sync(square, SEMITONE**4), 'sync4square.raw', overwrite=True)
+    write(sync(square, SEMITONE**8), 'sync8square.raw', overwrite=True)
+    write(sync(square, SEMITONE**16), 'sync16square.raw', overwrite=True)
+    write(sync(square, SEMITONE**20), 'sync20square.raw', overwrite=True)
