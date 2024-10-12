@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -MMD -D__LINUX_ALSA_ -std=c++11 -D__LITTLE_ENDEAN__ -fcompare-debug-second ${LIBS}
+CXXFLAGS = -Wall -MMD -D__LINUX_ALSA_ -std=c++11 -D__LITTLE_ENDIAN__ -fcompare-debug-second ${LIBS}
 LIBS = -I/usr/local/include/stk -lstk -lpigpio -lrt
 OBJECTS = main.o matrix.o utils.o wavetable.o blanket.o
 DEPENDS = ${OBJECTS:.o=.d}
