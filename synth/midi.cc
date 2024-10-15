@@ -5,6 +5,17 @@
 
 typedef unsigned int uint;
 
+MidiOut::MidiOut() {
+    // connect to port
+    unsigned int n = getPortNum();
+    out.openPort(n);
+
+    // set instrument to grand piano
+    setInst(0);
+    // set volume to full
+    setVol(127);
+}
+
 void MidiOut::message(int n, ...) {
     va_list ap;
     va_start(ap, n);
@@ -54,14 +65,6 @@ void MidiOut::setVol(uint vol, uint channel) {
     assert(vol <= 127);
     assert(channel < 16);
     message(3, 0xB0 + channel, 7, vol);
-}
-
-MidiOut::MidiOut() {
-    // connect to port
-    unsigned int n = getPortNum();
-    out.openPort(n);
-
-
 }
 
 void MidiOut::noteOn(uint pitch, uint vel, uint channel) {
