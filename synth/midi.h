@@ -8,10 +8,10 @@ public:
 
     void message(int n, ...);
 
-    void noteOn(unsigned int note, unsigned int channel=0);
-    void noteOff(unsigned int note, unsigned int channel=0);
-    void setInst(unsigned int inst, unsigned int channel=0);
-    void setVol(unsigned int vol, unsigned int channel=0);
+    void noteOn(unsigned note, unsigned vel, unsigned channel=0);
+    void noteOff(unsigned note, unsigned vel, unsigned channel=0);
+    void setInst(unsigned inst, unsigned channel=0);
+    void setVol(unsigned vol, unsigned channel=0);
     void listPorts();
 
 private:

@@ -64,9 +64,16 @@ MidiOut::MidiOut() {
 
 }
 
-void MidiOut::noteOn(uint pitch, uint channel) {
+void MidiOut::noteOn(uint pitch, uint vel, uint channel) {
     assert(channel < 16);
-    unsigned char message[3];
-    message[0] = 0x90 + channel;
-    //message[1] = 
+    assert(pitch <= 127);
+    assert(vel <= 127);
+    message(3, 0x90 + channel, pitch, vel);
+}
+
+void MidiOut::noteOff(uint pitch, uint vel, uint channel) {
+    assert(channel < 16);
+    assert(pitch <= 127);
+    assert(vel <= 127);
+    message(3, 0x80 + channel, pitch, vel);
 }
