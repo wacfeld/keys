@@ -3,13 +3,15 @@
 #include <cstdarg>
 #include <array>
 
+typedef unsigned int uint;
+
 void MidiOut::message(int n, ...) {
     va_list ap;
     va_start(ap, n);
 
     std::vector<unsigned char> bytes;
     for(int i = 0; i < n; i++) {
-        bytes.push_back(va_arg(ap, int));
+        bytes.push_back(va_arg(ap, unsigned int));
     }
 
     out.sendMessage(&bytes);
@@ -42,8 +44,16 @@ unsigned int MidiOut::getPortNum() {
     return 0;
 }
 
-void MidiOut::setInst(int inst, int channel) {
-    //unsigned char 
+void MidiOut::setInst(uint inst, uint channel) {
+    assert(channel < 16);
+    assert(inst <= 127);
+    message(2, 0xC0 + channel, inst);
+}
+
+void MidiOut::setVol(uint vol, uint channel) {
+    assert(vol <= 127);
+    assert(channel < 16);
+    message(3, 0xB0 + channel, 7, vol);
 }
 
 MidiOut::MidiOut() {
@@ -54,7 +64,7 @@ MidiOut::MidiOut() {
 
 }
 
-void MidiOut::noteOn(int pitch, int channel) {
+void MidiOut::noteOn(uint pitch, uint channel) {
     assert(channel < 16);
     unsigned char message[3];
     message[0] = 0x90 + channel;
