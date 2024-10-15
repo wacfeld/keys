@@ -37,7 +37,9 @@ int main()
   message[0] = 144;
   message[1] = 64;
   message[2] = 90;
+  puts("pressing note");
   midiout->sendMessage( &message );
+  puts("pressed note");
  
   usleep( 500000 ); // Platform-dependent ... see example in tests directory.
  
@@ -45,7 +47,9 @@ int main()
   message[0] = 128;
   message[1] = 64;
   message[2] = 40;
+  puts("releasing note");
   midiout->sendMessage( &message );
+  puts("released note");
  
   // Clean up
  cleanup:
