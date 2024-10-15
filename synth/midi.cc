@@ -66,6 +66,17 @@ void MidiOut::setVol(uint vol, uint channel) {
     message(3, 0xB0 + channel, 7, vol);
 }
 
+void MidiOut::pitchBend(uint val, uint channel) {
+    assert(channel < 16);
+    assert(val < 0x4000);
+
+    // least and most significant 7 bits
+    uint L = val & 0x7F;
+    uint M = val >> 7;
+
+    message(3, 0xE0 + channel, L, M);
+}
+
 void MidiOut::noteOn(uint pitch, uint vel, uint channel) {
     assert(channel < 16);
     assert(pitch <= 127);

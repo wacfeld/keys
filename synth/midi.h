@@ -2,7 +2,7 @@
 #define MIDI_H
 #include <RtMidi.h>
 
-// a general class which provides a nice interface to RtMidi functionality
+// a general class which provides a nice wrapper for RtMidi
 
 class MidiOut {
 public:
@@ -15,6 +15,8 @@ public:
     void noteOff(unsigned note, unsigned vel, unsigned channel=0);
     void setInst(unsigned inst, unsigned channel=0);
     void setVol(unsigned vol, unsigned channel=0);
+    void pitchBend(unsigned val, unsigned channel=0);
+
     void listPorts();
 
 private:
