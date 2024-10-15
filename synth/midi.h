@@ -2,6 +2,8 @@
 #define MIDI_H
 #include <RtMidi.h>
 
+// a general class which provides a nice interface to RtMidi functionality
+
 class MidiOut {
 public:
     MidiOut(void);

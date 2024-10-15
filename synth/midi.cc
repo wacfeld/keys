@@ -9,11 +9,6 @@ MidiOut::MidiOut() {
     // connect to port
     unsigned int n = getPortNum();
     out.openPort(n);
-
-    // set instrument to grand piano
-    setInst(0);
-    // set volume to full
-    setVol(127);
 }
 
 void MidiOut::message(int n, ...) {
