@@ -1,15 +1,10 @@
 CXX = g++
 CXXFLAGS = -Wall -MMD -D__LINUX_ALSA_ -std=c++11 -D__LITTLE_ENDIAN__ -fcompare-debug-second ${LIBS}
 LIBS = -I/usr/local/include/stk -lstk -lpigpio -lrt
-OBJECTS = main.o
-DEPENDS = ${OBJECTS:.o=.d}
-EXEC = $(shell basename $(CURDIR))
-${EXEC}: ${OBJECTS}
-	${CXX} ${OBJECTS} ${CXXFLAGS} -o ${EXEC}
-.PHONY: build
-build: ${OBJECTS}
-	${CXX} ${OBJECTS} ${CXXFLAGS} -o ${EXEC}
--include ${DEPENDS}
+E: E.cc
+	${CXX} E.cc ${CXXFLAGS} -o E
+ports: ports.cc
+	${CXX} ports.cc ${CXXFLAGS} -o ports
 .PHONY: clean
 clean:
-	rm ${OBJECTS} ${DEPENDS} ${EXEC}
+	rm E ports
