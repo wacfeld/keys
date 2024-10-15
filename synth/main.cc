@@ -1,11 +1,16 @@
 #define __OS_LINUX__
 
-#include <RtAudio.h>
+// standard library headers
 #include <signal.h>
 #include <atomic>
 #include <unistd.h>
-#include <SineWave.h>
+#include <cstdlib>
 
+// STK headers
+#include <SineWave.h>
+#include <RtAudio.h>
+
+// local headers
 #include "matrix.h"
 #include "utils.h"
 #include "wavetable.h"
@@ -42,11 +47,25 @@ double freqs[N_KEYS] = {
     329.6276
 };
 
+// global variables
 static volatile int stop = 0;
+RtAudio audioOut;
+
+void cleanup(RtAudio *out) {
+    if(out->isStreamOpen()) {
+        out->closeStream();
+    }
+}
 
 // ctrl-c handler
 void handler(int s) {
     stop = 1;
+}
+
+// exit handler
+void exiting() {
+    cleanup(&audioOut);
+    cleanupMatrix();
 }
 
 void init(RtAudio *out, callback f, void *data) {
@@ -63,12 +82,6 @@ void init(RtAudio *out, callback f, void *data) {
     }
 }
 
-void cleanup(RtAudio *out) {
-    if(out->isStreamOpen()) {
-        out->closeStream();
-    }
-}
-
 void printframes(StkFrames frames) {
     for(ulong i = 0; i < frames.size(); i++) {
         printf("%f ", frames[i]);
@@ -77,6 +90,8 @@ void printframes(StkFrames frames) {
 }
 
 void runWave(int argc, char **argv) {
+    std::atexit(exiting);
+
     std::string fname = "waves/sine.raw";
     std::string shape = "0.01:1;0.01:0";
     static char usage[] = "-f: raw file name\n-e: envelope shape\n";
@@ -105,11 +120,10 @@ void runWave(int argc, char **argv) {
     WavData data(wave, env, &mat, freqs);
 
     // init() with tick function and data
-    RtAudio out;
-    init(&out, wav_tick, (void*) &data);
+    init(&audioOut, wav_tick, (void*) &data);
 
-    if(out.startStream()) {
-        std::cout << out.getErrorText() << std::endl;
+    if(audioOut.startStream()) {
+        std::cout << audioOut.getErrorText() << std::endl;
         exit(1);
     }
 
@@ -117,8 +131,7 @@ void runWave(int argc, char **argv) {
         poll(&mat);
     }
 
-    cleanup(&out);
-    cleanupMatrix();
+    exit(0);
 }
 
 void printtick(Blanket *b, int n) {
