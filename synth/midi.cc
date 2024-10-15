@@ -11,6 +11,10 @@ MidiOut::MidiOut() {
     out.openPort(n);
 }
 
+MidiOut::~MidiOut() {
+    out.closePort();
+}
+
 void MidiOut::message(int n, ...) {
     va_list ap;
     va_start(ap, n);

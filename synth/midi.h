@@ -7,6 +7,7 @@
 class MidiOut {
 public:
     MidiOut(void);
+    ~MidiOut(void);
 
     void message(int n, ...);
 
