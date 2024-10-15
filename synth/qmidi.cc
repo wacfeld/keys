@@ -2,7 +2,7 @@
 
 typedef unsigned int uint;
 
-QuarterMidiOut::QuarterMidiOut(uint inst, uint vol) {
+QMidiOut::QMidiOut(uint inst, uint vol) {
     // set instruments
     midi.setInst(inst, 0);
     midi.setInst(inst, 1);
@@ -15,7 +15,7 @@ QuarterMidiOut::QuarterMidiOut(uint inst, uint vol) {
     midi.pitchBend(0x2800, 1);
 }
 
-QuarterMidiOut::~QuarterMidiOut() {
+QMidiOut::~QMidiOut() {
     // reset pitch bend
     midi.pitchBend(0x2000, 1);
 }
