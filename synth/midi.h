@@ -7,11 +7,12 @@ public:
     MidiOut(void);
     ~MidiOut(void);
 
-    void noteOn();
+    void noteOn(int note, int channel=0);
     void noteOff();
+    void listPorts();
 
 private:
-    RtMidiOut *out;
+    RtMidiOut out;
 };
 
 #endif
