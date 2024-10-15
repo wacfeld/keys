@@ -142,8 +142,8 @@ void blanketTest() {
 
 int main(int argc, char *argv[])
 {
-    QMidiOut qmidi;
-    for(int i = 64; i <= 64+24; i++) {
+    QMidiOut qmidi(4);
+    for(int i = 128; i <= 128+24; i++) {
         qmidi.noteOn(i, 100);
         usleep(500000);
         qmidi.noteOff(i, 100);
