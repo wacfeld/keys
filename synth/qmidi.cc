@@ -1,4 +1,4 @@
-#include "quartermidi.h"
+#include "qmidi.h"
 
 typedef unsigned int uint;
 
