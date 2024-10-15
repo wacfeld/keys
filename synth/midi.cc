@@ -1,5 +1,21 @@
 #include "midi.h"
 #include <cassert>
+#include <cstdarg>
+#include <array>
+
+void MidiOut::message(int n, ...) {
+    va_list ap;
+    va_start(ap, n);
+
+    std::vector<unsigned char> bytes;
+    for(int i = 0; i < n; i++) {
+        bytes.push_back(va_arg(ap, int));
+    }
+
+    out.sendMessage(&bytes);
+
+    va_end(ap);
+}
 
 void MidiOut::listPorts() {
     unsigned int n = out.getPortCount();
@@ -10,10 +26,32 @@ void MidiOut::listPorts() {
     }
 }
 
-MidiOut::MidiOut() {
-    // find the correct port
+unsigned int MidiOut::getPortNum() {
+    unsigned int n = out.getPortCount();
+    for(unsigned int i = 0; i < n; i++) {
+        std::string name = out.getPortName(i);
 
-    out.openPort(0);
+        // check if port name starts with "f_midi"
+        if(name.rfind("f_midi", 0) == 0) {
+            return i;
+        }
+    }
+
+    listPorts();
+    std::cerr << "MidiOut::getPortNum(): Could not find port name starting with \"f_midi\", returning port number 0\n";
+    return 0;
+}
+
+void MidiOut::setInst(int inst, int channel) {
+    //unsigned char 
+}
+
+MidiOut::MidiOut() {
+    // connect to port
+    unsigned int n = getPortNum();
+    out.openPort(n);
+
+
 }
 
 void MidiOut::noteOn(int pitch, int channel) {
