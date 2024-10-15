@@ -9,6 +9,7 @@
 class QuarterMidiOut {
     // default to grand piano, full volume
     QuarterMidiOut(unsigned inst=0, unsigned vol=127);
+    ~QuarterMidiOut();
 
 private:
     MidiOut midi;

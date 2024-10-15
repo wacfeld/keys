@@ -12,4 +12,10 @@ QuarterMidiOut::QuarterMidiOut(uint inst, uint vol) {
     midi.setVol(vol, 1);
 
     // pitch bend channel 1 up by a quarter tone permanently
+    midi.pitchBend(0x2800, 1);
+}
+
+QuarterMidiOut::~QuarterMidiOut() {
+    // reset pitch bend
+    midi.pitchBend(0x2000, 1);
 }
