@@ -144,7 +144,9 @@ int main(int argc, char *argv[])
 {
     MidiOut midi;
     midi.noteOn(64, 90);
-    usleep(500000);
+    usleep(1000000);
+    midi.pitchBend(0x2000);
+    usleep(1000000);
     midi.noteOff(64, 90);
     //blanketTest();
     //runWave(argc, argv);
