@@ -10,7 +10,7 @@
 #include "utils.h"
 #include "wavetable.h"
 #include "blanket.h"
-#include "midi.h"
+#include "qmidi.h"
 
 #define N_KEYS 25
 #define N_OUT 5
@@ -142,12 +142,12 @@ void blanketTest() {
 
 int main(int argc, char *argv[])
 {
-    MidiOut midi;
-    midi.noteOn(64, 90);
-    usleep(1000000);
-    midi.pitchBend(0x2000);
-    usleep(1000000);
-    midi.noteOff(64, 90);
+    QMidiOut qmidi;
+    for(int i = 64; i <= 64+24; i++) {
+        qmidi.noteOn(i, 100);
+        usleep(500000);
+        qmidi.noteOff(i, 100);
+    }
     //blanketTest();
     //runWave(argc, argv);
     return 0;
