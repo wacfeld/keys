@@ -23,17 +23,20 @@ int main()
   // Send out a series of MIDI messages.
  
   // Program change: 192, 5
+  // set instrument to 5 (electric piano 1)
   message.push_back( 192 );
   message.push_back( 5 );
   midiout->sendMessage( &message );
  
   // Control Change: 176, 7, 100 (volume)
+  // set volume to 100
   message[0] = 176;
   message[1] = 7;
   message.push_back( 100 );
   midiout->sendMessage( &message );
  
   // Note On: 144, 64, 90
+  // press E
   message[0] = 144;
   message[1] = 64;
   message[2] = 90;
@@ -41,9 +44,10 @@ int main()
   midiout->sendMessage( &message );
   puts("pressed note");
  
-  usleep( 500000 ); // Platform-dependent ... see example in tests directory.
+  usleep( 500000 );
  
   // Note Off: 128, 64, 40
+  // release E
   message[0] = 128;
   message[1] = 64;
   message[2] = 40;
