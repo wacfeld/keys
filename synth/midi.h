@@ -5,7 +5,6 @@
 class MidiOut {
 public:
     MidiOut(void);
-    ~MidiOut(void);
 
     void noteOn(int note, int channel=0);
     void noteOff();
