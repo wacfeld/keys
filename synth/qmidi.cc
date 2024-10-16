@@ -10,6 +10,8 @@ QMidiOut::QMidiOut(uint inst, uint vol) {
 
     // pitch bend channel 1 up by a quarter tone permanently
     midi.pitchBend(0x2800, 1);
+    // make sure channel 0 has no pitch bend
+    midi.pitchBend(0x2000, 0);
 }
 
 QMidiOut::~QMidiOut() {
