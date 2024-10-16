@@ -1,9 +1,11 @@
 #define __OS_LINUX__
 
-#include <RtAudio.h>
 #include <signal.h>
 #include <atomic>
 #include <unistd.h>
+#include <set>
+
+#include <RtAudio.h>
 #include <SineWave.h>
 
 #include "matrix.h"
@@ -15,6 +17,9 @@
 #define N_KEYS 25
 #define N_OUT 5
 #define N_IN 5
+
+// midi 52 is E (164.8 Hz), multiply that by 2
+#define MIDIOFFSET 104
 
 //#define SAMPLERATE 48000
 #define SAMPLERATE 44100
@@ -77,7 +82,7 @@ void printframes(StkFrames frames) {
     putchar('\n');
 }
 
-void runWave(int argc, char **argv) {
+void runKeyboard(int argc, char **argv) {
     std::string fname = "waves/sine.raw";
     std::string shape = "0.01:1;0.01:0";
     static char usage[] = "-f: raw file name\n-e: envelope shape\n";
@@ -114,8 +119,23 @@ void runWave(int argc, char **argv) {
         exit(1);
     }
 
+    QMidiOut qmidi(4);
+    std::set<int> held;
+
     while(!stop) {
         poll(&mat);
+
+        // update midi
+        for(int i = 0; i < mat.keys; i++) {
+            if(mat.buf[i] == 1 && held.count(i) == 0) {
+                held.insert(i);
+                qmidi.noteOn(MIDIOFFSET + i);
+            }
+            else if(mat.buf[i] == 0 && held.count(i) > 0) {
+                held.erase(i);
+                qmidi.noteOff(MIDIOFFSET + i);
+            }
+        }
     }
 
     cleanup(&out);
@@ -142,13 +162,14 @@ void blanketTest() {
 
 int main(int argc, char *argv[])
 {
-    QMidiOut qmidi(4);
-    for(int i = 128; i <= 128+24; i++) {
-        qmidi.noteOn(i, 100);
-        usleep(500000);
-        qmidi.noteOff(i, 100);
-    }
+    //QMidiOut qmidi(4);
+    //for(int i = 128; i <= 128+24; i++) {
+    //    qmidi.noteOn(i, 100);
+    //    usleep(500000);
+    //    qmidi.noteOff(i, 100);
+    //}
     //blanketTest();
-    //runWave(argc, argv);
+
+    runKeyboard(argc, argv);
     return 0;
 }
