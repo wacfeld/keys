@@ -31,4 +31,4 @@ def pitchBend(val, channel=0):
     assert 0 <= channel < 16
     L = val & 0x7F
     M = val >> 7
-    message(0xE0 + channel, L, M)
+    write(0xE0 + channel, L, M)
