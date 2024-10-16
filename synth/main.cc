@@ -162,12 +162,25 @@ void blanketTest() {
 
 int main(int argc, char *argv[])
 {
+    //MidiOut midi;
+    //midi.setInst(4);
+    //midi.setVol(100);
+    //midi.pitchBend(0x2000);
+    //midi.noteOn(64, 100);
+    //usleep(500000);
+    //midi.noteOff(64, 100);
+    //midi.pitchBend(0x2800);
+    //midi.noteOn(64, 100);
+    //usleep(500000);
+    //midi.noteOff(64, 100);
+    //
     //QMidiOut qmidi(4);
     //for(int i = 128; i <= 128+24; i++) {
     //    qmidi.noteOn(i, 100);
     //    usleep(500000);
     //    qmidi.noteOff(i, 100);
     //}
+
     //blanketTest();
 
     runKeyboard(argc, argv);
