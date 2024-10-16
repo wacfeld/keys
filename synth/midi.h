@@ -11,8 +11,8 @@ public:
 
     void message(int n, ...);
 
-    void noteOn(unsigned note, unsigned vel, unsigned channel=0);
-    void noteOff(unsigned note, unsigned vel, unsigned channel=0);
+    void noteOn(unsigned note, unsigned vel=127, unsigned channel=0);
+    void noteOff(unsigned note, unsigned vel=127, unsigned channel=0);
     void setInst(unsigned inst, unsigned channel=0);
     void setVol(unsigned vol, unsigned channel=0);
     void pitchBend(unsigned val, unsigned channel=0);

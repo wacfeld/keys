@@ -17,8 +17,8 @@ public:
     // 2 -> midi 1
     // 3 -> quarter tone above midi 1
     // etc.
-    void noteOn(unsigned note, unsigned vel);
-    void noteOff(unsigned note, unsigned vel);
+    void noteOn(unsigned note, unsigned vel=127);
+    void noteOff(unsigned note, unsigned vel=127);
 
     void setVol(unsigned vol);
     void setInst(unsigned inst);
