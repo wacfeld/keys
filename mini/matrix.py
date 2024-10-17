@@ -3,7 +3,7 @@ import board
 import digitalio
 
 # outputs, inputs are positive integers
-def init_matrix(outputs, inputs):
+def init(outputs, inputs):
     global _cs595, _cs165, _spi, _outputs, _inputs
     
     _outputs, _inputs, = outputs, inputs
@@ -24,7 +24,7 @@ def init_matrix(outputs, inputs):
         pass
     _spi.configure(baudrate=5000000, phase=0, polarity=0)
 
-def cleanup_matrix():
+def cleanup():
     _spi.unlock()
 
 def _write(data):
