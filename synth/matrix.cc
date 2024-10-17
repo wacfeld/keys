@@ -27,6 +27,11 @@ void cleanupMatrix() {
 
 // poll all the keys and write to the output buffer
 void poll(Matrix *mat) {
+    // TODO generalize to multiple bytes
+    if(mat->out > 8 || mat->in > 8) {
+        std::cerr << "poll(): matrix side lengths greater than 8 not supported yet\n";
+        exit(1);
+    }
     int c = 0;
     for(int i = 0; i < mat->out; i++) {
         char data = 1 << i;
