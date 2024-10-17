@@ -32,6 +32,10 @@ void poll(Matrix *mat) {
         std::cerr << "poll(): matrix side lengths greater than 8 not supported yet\n";
         exit(1);
     }
+    // TODO resolve this or simply eliminate the keys field
+    if(mat->out * mat->in != mat->keys) {
+        std::cerr << "poll(): keys != in * out\n";
+    }
     int c = 0;
     for(int i = 0; i < mat->out; i++) {
         char data = 1 << i;
