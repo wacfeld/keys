@@ -6,7 +6,7 @@ import digitalio
 def init_matrix(outputs, inputs):
     global _cs595, _cs165, _spi, _outputs, _inputs
     
-    _outputs, _inputs, _keys = outputs, inputs
+    _outputs, _inputs, = outputs, inputs
     
     # initialize latch pins
     _cs595 = digitalio.DigitalInOut(board.GP1)
@@ -19,7 +19,7 @@ def init_matrix(outputs, inputs):
     _cs165.value = False
 
     # connect to SPI
-    _spi = busio.SPI(board.GP18, MOSI=board.GP19)
+    _spi = busio.SPI(board.GP18, MOSI=board.GP19, MISO=board.GP16)
     while not _spi.try_lock():
         pass
     _spi.configure(baudrate=5000000, phase=0, polarity=0)
@@ -28,14 +28,14 @@ def cleanup_matrix():
     _spi.unlock()
 
 def _write(data):
-    _cs595.level = False
+    _cs595.value = False
     _spi.write(data)
-    _cs595.level = True
+    _cs595.value = True
 
 def _readinto(data):
-    _cs165.level = True
+    _cs165.value = True
     _spi.readinto(data)
-    _cs165.level = False
+    _cs165.value = False
 
 def poll():
     buffer = [None] * _inputs * _outputs
@@ -49,7 +49,6 @@ def poll():
         # allocate ceil(inputs/8) bytes for input
         result = bytearray(-(_inputs//-8))
         _readinto(result)
-        
         # transfer to buffer
         for j in range(_inputs):
             if j % 8 == 0 and j > 0:
