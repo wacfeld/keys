@@ -2,12 +2,11 @@ import busio
 import board
 import digitalio
 
-# outputs, inputs, and keys are positive integers
-# keys <= outputs * inputs
-def init_matrix(outputs, inputs, keys):
-    global _cs595, _cs165, _spi, _outputs, _inputs, _keys
+# outputs, inputs are positive integers
+def init_matrix(outputs, inputs):
+    global _cs595, _cs165, _spi, _outputs, _inputs
     
-    _outputs, _inputs, _keys = outputs, inputs, keys
+    _outputs, _inputs, _keys = outputs, inputs
     
     # initialize latch pins
     _cs595 = digitalio.DigitalInOut(board.GP1)
@@ -39,8 +38,7 @@ def _readinto(data):
     _cs165.level = False
 
 def poll():
-    buffer = [None] * _keys
-    c = 0
+    buffer = [None] * _inputs * _outputs
 
     for i in range(_outputs):
         # compute output data (one hot)
@@ -49,7 +47,17 @@ def poll():
         _write(data)
 
         # allocate ceil(inputs/8) bytes for input
-        result = bytearray(-(inputs//-8))
+        result = bytearray(-(_inputs//-8))
         _readinto(result)
         
-        # write to buffer
+        # transfer to buffer
+        for j in range(_inputs):
+            if j % 8 == 0 and j > 0:
+                # TODO check this is not backwards
+                # remove last byte as it's been read
+                result = result[:-1]
+            
+            buffer[j * _outputs + i] = result[-1] % 2
+            result[-1] //= 2
+    
+    return buffer
