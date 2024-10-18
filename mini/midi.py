@@ -1,6 +1,11 @@
 import usb_midi
 
+_in = usb_midi.ports[0]
 _out = usb_midi.ports[1]
+
+def read(n):
+    return _in.read(n)
+
 def write(*args):
     _out.write(bytes(args))
 

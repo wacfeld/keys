@@ -1,5 +1,6 @@
 import matrix
 import qmidi
+import midi
 
 OUTPUTS = 5
 INPUTS = 5
@@ -11,6 +12,11 @@ if __name__ == '__main__':
     
     held = set()
     while True:
+        # TODO periodically re-do the pitch bend, or else do it before every note press
+        #s = midi.read(1)
+        #if s != b'':
+        #    print(s)
+
         buffer = matrix.poll()
         
         for i in range(len(buffer)):
