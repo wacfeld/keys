@@ -1,16 +1,8 @@
-import board
-import digitalio
+from machine import Pin
 import time
 
-pin = digitalio.DigitalInOut(board.GP16)
-pin.direction = digitalio.Direction.INPUT
-pin.pull = digitalio.Pull.UP
+pin = Pin(16, Pin.IN, Pin.PULL_UP)
 
-a = [0,0]
 while True:
-    val = pin.value
-    if val:
-        a[0]+=1
-    else:
-        a[1]+=1
-    print(a)
+    print(pin.value())
+    time.sleep(0.1)
